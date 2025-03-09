@@ -1,7 +1,7 @@
 # RV32I_Pipeline_CPU
 
 ## 项目目录结构
-![img](https://pic1.imgdb.cn/item/67cd5a0a066befcec6e207db.png)
+![img](./docs/1.png)
 ## 项目说明
 
 - **docs/**: 存放项目相关的文档，包括 CPU 架构设计、支持的指令集以及未来适配 RT-Thread 的规划。
