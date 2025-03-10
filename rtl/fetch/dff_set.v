@@ -1,5 +1,4 @@
-`include "defines.v"
-
+// 带异步置位功能的D触发器
 module dff_set #(
     parameter DW = 32
 ) (

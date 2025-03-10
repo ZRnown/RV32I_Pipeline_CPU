@@ -1,3 +1,4 @@
+// ALU，用于运算
 module ALU (
     input  wire [31:0] A,
     input  wire [31:0] B,

@@ -1,4 +1,5 @@
-module ifetch (
+// if => instruction fetch取指令部分，这里为了避免命名与if冲突而命名为iF
+module iF (
     // from PC
     input wire [31:0] pc_addr_i,
     // instruction from ROM
