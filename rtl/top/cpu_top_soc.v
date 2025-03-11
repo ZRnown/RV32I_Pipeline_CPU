@@ -1,6 +1,6 @@
 module cpu_top_soc (
     input wire clk,
-    input wire rst_n
+    input wire rst
 );
   // cpu_top to imem
   wire [31:0] cpu_top_inst_addr_o;
@@ -8,7 +8,7 @@ module cpu_top_soc (
   wire [31:0] cpu_top_inst_o;
   cpu_top cpu_top_inst (
       .clk(clk),
-      .rst_n(rst_n),
+      .rst(rst),
       .inst_i(cpu_top_inst_o),
       .inst_addr_o(cpu_top_inst_addr_o)
   );

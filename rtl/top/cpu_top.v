@@ -1,6 +1,6 @@
 module cpu_top (
     input wire clk,
-    input wire rst_n,
+    input wire rst,
     input wire [31:0] inst_i,
     output wire [31:0] inst_addr_o
 );
@@ -68,8 +68,8 @@ module cpu_top (
   wire [31:0] id_ex_inst_addr_o;
   wire [31:0] id_ex_op1_o;
   wire [31:0] id_ex_op2_o;
-  wire [31:0] id_ex_rd_addr_o;
-  wire [31:0] id_ex_reg_wen_o;
+  wire [4:0] id_ex_rd_addr_o;
+  wire id_ex_reg_wen_o;
   id_ex id_ex_inst (
       .clk(clk),
       .rst(rst),
