@@ -1,3 +1,4 @@
+// 32个通用寄存器
 module regs (
     input wire clk,
     input wire rst,
