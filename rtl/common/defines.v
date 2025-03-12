@@ -79,3 +79,4 @@
 `define ALU_SRA 4'b0111
 `define ALU_SLT 4'b1000
 `define ALU_SLTU 4'b1001
+`define ALU_DEFAULT 4'b1111

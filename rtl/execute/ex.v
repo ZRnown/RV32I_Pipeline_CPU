@@ -13,20 +13,18 @@ module ex (
     output reg rd_wen_o
 );
   // 指令字段解析
-  wire [ 6:0] opcode;
-  wire [ 4:0] rd;
-  wire [ 2:0] funct3;
-  wire [ 4:0] rs1;
-  wire [ 4:0] rs2;
-  wire [11:0] imm;
-  wire [ 6:0] funct7;
+  wire [6:0] opcode;
+  wire [4:0] rd;
+  wire [2:0] funct3;
+  wire [4:0] rs1;
+  wire [4:0] rs2;
+  wire [6:0] funct7;
   assign opcode = inst_i[6:0];
   assign rd     = inst_i[11:7];
   assign funct3 = inst_i[14:12];
   assign rs1    = inst_i[19:15];
   assign rs2    = inst_i[24:20];
   assign funct7 = inst_i[31:25];
-  assign imm    = inst_i[31:20];
   //   ALU Signal
   wire [31:0] alu_result;
   reg  [ 3:0] alu_op;
@@ -52,9 +50,10 @@ module ex (
             rd_wen_o = 1'b1;
           end
           default: begin
+            alu_op = `ALU_DEFAULT;
             rd_addr_o = 5'b0;
             rd_data_o = 32'b0;
-            rd_wen_o  = 1'b0;
+            rd_wen_o = 1'b0;
           end
         endcase
       end
@@ -71,9 +70,10 @@ module ex (
             rd_wen_o  = 1'b1;
           end
           default: begin
+            alu_op = `ALU_DEFAULT;
             rd_addr_o = 5'b0;
             rd_data_o = 32'b0;
-            rd_wen_o  = 1'b0;
+            rd_wen_o = 1'b0;
           end
         endcase
       end

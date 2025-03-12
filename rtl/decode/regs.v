@@ -19,14 +19,14 @@ module regs (
   always @(*) begin
     if (rst == 1'b0) reg1_data_o = 32'b0;
     else if (reg1_addr_i == 5'b0) reg1_data_o = 32'b0;
-    else if (reg_wen && reg1_addr_i == reg_waddr_i) reg1_data_o = reg_waddr_i;
+    else if (reg_wen && reg1_addr_i == reg_waddr_i) reg1_data_o = reg_wdata_i;
     else reg1_data_o = regs[reg1_addr_i];
   end
   // 读寄存器2
   always @(*) begin
     if (rst == 1'b0) reg2_data_o = 32'b0;
     else if (reg2_addr_i == 5'b0) reg2_data_o = 32'b0;
-    else if (reg_wen && reg2_addr_i == reg_waddr_i) reg2_data_o = reg_waddr_i;
+    else if (reg_wen && reg2_addr_i == reg_waddr_i) reg2_data_o = reg_wdata_i;
     else reg2_data_o = regs[reg2_addr_i];
   end
   // 写寄存器
