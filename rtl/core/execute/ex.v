@@ -10,24 +10,27 @@ module ex (
     // to regs
     output reg [4:0] rd_addr_o,
     output reg [31:0] rd_data_o,
-    output reg rd_wen_o
+    output reg rd_wen_o,
+    // to control
+    output reg [31:0] jump_addr_o,
+    output reg jump_en_o,
+    output reg hold_flag_o
 );
   // 指令字段解析
-  wire [6:0] opcode;
-  wire [4:0] rd;
-  wire [2:0] funct3;
-  wire [4:0] rs1;
-  wire [4:0] rs2;
-  wire [6:0] funct7;
-  assign opcode = inst_i[6:0];
-  assign rd     = inst_i[11:7];
-  assign funct3 = inst_i[14:12];
-  assign rs1    = inst_i[19:15];
-  assign rs2    = inst_i[24:20];
-  assign funct7 = inst_i[31:25];
+  wire [6:0] opcode = inst_i[6:0];
+  wire [4:0] rd = inst_i[11:7];
+  wire [2:0] funct3 = inst_i[14:12];
+  wire [4:0] rs1 = inst_i[19:15];
+  wire [4:0] rs2 = inst_i[24:20];
+  wire [6:0] funct7 = inst_i[31:25];
   //   ALU Signal
   wire [31:0] alu_result;
-  reg  [ 3:0] alu_op;
+  reg [3:0] alu_op;
+  // branch imm
+  wire [31:0] jump_imm = {
+    {19{inst_i[31]}}, inst_i[31], inst_i[7], inst_i[30:25], inst_i[11:8], 1'b0
+  };
+  wire op1_i_equal_op2_i = (op1_i == op2_i) ? 1'b1 : 1'b0;
   //   ALU 例化
   ALU alu (
       .A (op1_i),
@@ -39,7 +42,10 @@ module ex (
     rd_addr_o = 5'b0;
     rd_data_o = 32'b0;
     rd_wen_o  = 1'b0;
-    alu_op    = 4'b0;  // 默认 ALU 操作码
+    alu_op    = `ALU_DEFAULT;  // 默认 ALU 操作码
+    jump_addr_o = 32'b0;
+    jump_en_o = 1'b0;
+    hold_flag_o = 1'b0;
     case (opcode)
       `INST_TYPE_I: begin
         case (funct3)
@@ -68,6 +74,33 @@ module ex (
             rd_data_o = alu_result;
             rd_addr_o = rd_addr_i;
             rd_wen_o  = 1'b1;
+          end
+          `INST_TYPE_B: begin
+            case (funct3)
+              `INST_BEQ: begin
+                jump_addr_o = (inst_addr_i + jump_imm) & (op1_i_equal_op2_i);
+                jump_en_o   = op1_i_equal_op2_i;
+                hold_flag_o = 1'b0;
+              end
+              `INST_BNE: begin
+                jump_addr_o = (inst_addr_i + jump_imm) & (~op1_i_equal_op2_i);
+                jump_en_o   = ~op1_i_equal_op2_i;
+                hold_flag_o = 1'b0;
+              end
+              default: begin
+                jump_addr_o = 32'b0;
+                jump_en_o   = 1'b0;
+                hold_flag_o = 1'b0;
+              end
+            endcase
+          end
+          `INST_JAL: begin
+            rd_addr_o = rd_addr_i;
+            rd_data_o = inst_addr_i + 32'h4;
+            jump_addr_o = op1_i + inst_addr_i;
+            rd_wen_o = 1'b1;
+            jump_en_o = 1'b1;
+            hold_flag_o = 1'b0;
           end
           default: begin
             alu_op = `ALU_DEFAULT;

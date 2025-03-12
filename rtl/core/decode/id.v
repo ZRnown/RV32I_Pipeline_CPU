@@ -55,7 +55,7 @@ module id (
         case (funct3)
           `INST_ADD_SUB: begin
             rs1_addr_o = rs1;  // 寄存器1
-            rs2_addr_o = rs2;  // 寄存器1
+            rs2_addr_o = rs2;  // 寄存器2
             op1_o = rs1_data_i;
             op2_o = rs2_data_i;
             rd_addr_o = rd;  // 目标寄存器
@@ -70,6 +70,34 @@ module id (
             reg_wen    = 1'b0;
           end
         endcase
+      end
+      `INST_TYPE_B: begin
+        case (funct3)
+          `INST_BNE, `INST_BEQ: begin
+            rs1_addr_o = rs1;  // 寄存器1
+            rs2_addr_o = rs2;  // 寄存器2
+            op1_o      = rs1_data_i;
+            op2_o      = rs2_data_i;
+            rd_addr_o  = 5'b0;
+            reg_wen    = 1'b0;
+          end
+          default: begin
+            rs1_addr_o = 5'b0;
+            rs2_addr_o = 5'b0;
+            op1_o      = 32'b0;
+            op2_o      = 32'b0;
+            rd_addr_o  = 5'b0;
+            reg_wen    = 1'b0;
+          end
+        endcase
+      end
+      `INST_JAL: begin
+        rs1_addr_o = 5'b0;
+        rs2_addr_o = 5'b0;
+        op1_o      = {{12{inst_i[31]}}, inst_i[19:12], inst_i[20], inst_i[30:21], 1'b0};
+        op2_o      = 32'b0;
+        rd_addr_o  = 5'b0;
+        reg_wen    = 1'b0;
       end
       default: begin
         rs1_addr_o = 5'b0;
