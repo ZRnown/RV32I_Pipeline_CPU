@@ -26,6 +26,7 @@ module id (
   wire [ 4:0] rd = inst_i[11:7];
   wire [ 2:0] funct3 = inst_i[14:12];
   wire [ 6:0] funct7 = inst_i[31:25];
+  wire [ 4:0] shamt = inst_i[24:20];
 
   always @(*) begin
     inst_o = inst_i;
@@ -33,7 +34,7 @@ module id (
     case (opcode)
       `INST_TYPE_I: begin
         case (funct3)
-          `INST_ADDI: begin
+          `INST_ADDI,`INST_SLTI,`INST_SLTIU,`INST_XORI,`INST_ORI,`INST_ANDI: begin
             rs1_addr_o = rs1;  // 寄存器1
             rs2_addr_o = 5'b0;
             op1_o = rs1_data_i;
@@ -41,6 +42,14 @@ module id (
             rd_addr_o = rd;  // 目标寄存器
             reg_wen = 1'b1;
           end
+		  `INST_SLLI,`INST_SRI:begin
+		    rs1_addr_o = rs1;  // 寄存器1
+            rs2_addr_o = 5'b0;
+            op1_o = rs1_data_i;
+            op2_o = {27'b0, shamt};
+            rd_addr_o = rd;  // 目标寄存器
+            reg_wen = 1'b1;
+		  end
           default: begin
             rs1_addr_o = 5'b0;
             rs2_addr_o = 5'b0;

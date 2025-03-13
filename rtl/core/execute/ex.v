@@ -23,11 +23,18 @@ module ex (
   wire [4:0] rs1 = inst_i[19:15];
   wire [4:0] rs2 = inst_i[24:20];
   wire [6:0] funct7 = inst_i[31:25];
+  wire [11:0] imm = inst_i[31:20];
+  wire [4:0] shamt = inst_i[24:20];
   // branch imm
   wire [31:0] jump_imm = {
     {19{inst_i[31]}}, inst_i[31], inst_i[7], inst_i[30:25], inst_i[11:8], 1'b0
   };
   wire op1_i_equal_op2_i = (op1_i == op2_i) ? 1'b1 : 1'b0;
+  wire op1_i_less_op2_i_signed = ($signed(op1_i) < $signed(op2_i)) ? 1'b1 : 1'b0;
+  wire op1_i_less_op2_i_unsigned = (op1_i < op2_i) ? 1'b1 : 1'b0;
+  // tpye I
+  wire [31:0] SRA_mask = (32'hffff_ffff) >> shamt[4:0];
+  
   always @(*) begin
     case (opcode)
       `INST_TYPE_I: begin
@@ -40,9 +47,50 @@ module ex (
             rd_addr_o = rd_addr_i;
             rd_wen_o  = 1'b1;
           end
-          default: begin
-            rd_addr_o = 5'b0;
+		  `INST_SLTI: begin
+            rd_data_o = {30'b0, op1_i_equal_op2_i};
+            rd_addr_o = rd_addr_i;
+            rd_wen_o  = 1'b1;
+          end
+		  `INST_SLTIU: begin
+            rd_data_o = {30'b0, op1_i_less_op2_i_unsigned};
+            rd_addr_o = rd_addr_i;
+            rd_wen_o  = 1'b1;
+          end
+		  `INST_XORI: begin
+            rd_data_o = op1_i ^ op2_i;
+            rd_addr_o = rd_addr_i;
+            rd_wen_o  = 1'b1;
+          end
+		  `INST_ORI: begin
+            rd_data_o = op1_i + op2_i;
+            rd_addr_o = rd_addr_i;
+            rd_wen_o  = 1'b1;
+          end
+		  `INST_ANDI: begin
+            rd_data_o = op1_i & op2_i;
+            rd_addr_o = rd_addr_i;
+            rd_wen_o  = 1'b1;
+          end
+		  `INST_SLLI: begin
+            rd_data_o = op1_i << shamt;
+            rd_addr_o = rd_addr_i;
+            rd_wen_o  = 1'b1;
+          end
+		  `INST_SRI:begin
+		    if (funct7[5] == 1'b1) begin
+			  rd_data_o = ((op1_i >> shamt) & SRA_mask) | ({32{op1_i[31]}} & (~SRA_mask));
+              rd_addr_o = rd_addr_i;
+              rd_wen_o  = 1'b1;
+			end else begin
+			  rd_data_o = op1_i >> op2_i[4:0];
+              rd_addr_o = rd_addr_i;
+              rd_wen_o  = 1'b1;
+		  end
+		  end
+          default:begin
             rd_data_o = 32'b0;
+            rd_addr_o = 5'b0;
             rd_wen_o  = 1'b0;
           end
         endcase
