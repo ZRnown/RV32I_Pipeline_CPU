@@ -29,14 +29,11 @@ module ex (
   };
   wire op1_i_equal_op2_i = (op1_i == op2_i) ? 1'b1 : 1'b0;
   always @(*) begin
-    rd_addr_o = 5'b0;
-    rd_data_o = 32'b0;
-    rd_wen_o = 1'b0;
-    jump_addr_o = 32'b0;
-    jump_en_o = 1'b0;
-    hold_flag_o = 1'b0;
     case (opcode)
       `INST_TYPE_I: begin
+        jump_addr_o = 32'b0;
+        jump_en_o   = 1'b0;
+        hold_flag_o = 1'b0;
         case (funct3)
           `INST_ADDI: begin
             rd_data_o = op1_i + op2_i;
@@ -51,6 +48,9 @@ module ex (
         endcase
       end
       `INST_TYPE_R_M: begin
+        jump_addr_o = 32'b0;
+        jump_en_o   = 1'b0;
+        hold_flag_o = 1'b0;
         case (funct3)
           `INST_ADD_SUB: begin
             if (funct7 == 7'b000_0000) begin
@@ -69,14 +69,17 @@ module ex (
         endcase
       end
       `INST_TYPE_B: begin
+        rd_data_o = 32'b0;
+        rd_addr_o = 5'b0;
+        rd_wen_o  = 1'b0;
         case (funct3)
           `INST_BEQ: begin
-            jump_addr_o = (inst_addr_i + jump_imm) & (op1_i_equal_op2_i);
+            jump_addr_o = (inst_addr_i + jump_imm) & {32{(op1_i_equal_op2_i)}};
             jump_en_o   = op1_i_equal_op2_i;
             hold_flag_o = 1'b0;
           end
           `INST_BNE: begin
-            jump_addr_o = (inst_addr_i + jump_imm) & (~op1_i_equal_op2_i);
+            jump_addr_o = (inst_addr_i + jump_imm) & {32{(~op1_i_equal_op2_i)}};
             jump_en_o   = ~op1_i_equal_op2_i;
             hold_flag_o = 1'b0;
           end
@@ -98,12 +101,18 @@ module ex (
       `INST_LUI: begin
         rd_addr_o = rd_addr_i;
         rd_data_o = op1_i;
-        rd_wen_o  = 1'b1;
+        rd_wen_o = 1'b1;
+        jump_addr_o = 32'b0;
+        jump_en_o = 1'b0;
+        hold_flag_o = 1'b0;
       end
       default: begin
-        rd_addr_o = 5'b0;
         rd_data_o = 32'b0;
-        rd_wen_o  = 1'b0;
+        rd_addr_o = 5'b0;
+        rd_wen_o = 1'b0;
+        jump_addr_o = 32'b0;
+        jump_en_o = 1'b0;
+        hold_flag_o = 1'b0;
       end
     endcase
   end

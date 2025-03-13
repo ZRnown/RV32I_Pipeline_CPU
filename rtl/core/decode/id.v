@@ -96,7 +96,7 @@ module id (
         rs2_addr_o = 5'b0;
         op1_o      = {{12{inst_i[31]}}, inst_i[19:12], inst_i[20], inst_i[30:21], 1'b0};
         op2_o      = 32'b0;
-        rd_addr_o  = 5'b0;
+        rd_addr_o  = rd;
         reg_wen    = 1'b0;
       end
       `INST_LUI: begin

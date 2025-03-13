@@ -1,140 +1,160 @@
 module cpu_top (
-    input wire clk,
-    input wire rst,
-    input wire [31:0] inst_i,
+    input  wire        clk,
+    input  wire        rst,
+    input  wire [31:0] inst_i,
     output wire [31:0] inst_addr_o
 );
-  //   pc to if
-  wire [31:0] pc_reg_o;
-  //   if to if_id
-  wire [31:0] if_inst_addr_o;
-  wire [31:0] if_inst_o;
-  //   if_id to id
-  wire [31:0] if_id_inst_o;
-  wire [31:0] if_id_inst_addr_o;
-  //   id to regs
-  wire [4:0] id_rs1_addr_o;
-  wire [4:0] id_rs2_addr_o;
-  //   regs to id
-  wire [31:0] id_rs1_data_i;
-  wire [31:0] id_rs2_data_i;
-  //   id to id_ex
-  wire [31:0] id_inst_o;
-  wire [31:0] id_inst_addr_o;
-  wire [31:0] id_op1_o;
-  wire [31:0] id_op2_o;
-  wire [4:0] id_rd_addr_o;
-  wire id_reg_wen;
-  //   id_ex to ex
-  wire [31:0] id_ex_inst_o;
-  wire [31:0] id_ex_inst_addr_o;
-  wire [31:0] id_ex_op1_o;
-  wire [31:0] id_ex_op2_o;
-  wire [4:0] id_ex_rd_addr_o;
-  wire id_ex_reg_wen_o;
-  //   ex to regs
-  wire [4:0] ex_rd_addr_o;
-  wire [31:0] ex_rd_data_o;
-  wire rd_wen_o;
-  // ex to contorl
-  wire [31:0] ex_jump_addr_o;
-  wire ex_jump_en_o;
-  wire ex_hold_flag_o;
-  // control to pc_reg if_id id_ex
-  wire [31:0] control_jump_addr_o;
-  wire control_jump_en_o;
-  wire control_hold_flag_o;
-  //   程序计数器例化
+  // PC to IF
+  wire [31:0] pc_if_addr;
+
+  // IF to IF/ID
+  wire [31:0] if_ifid_inst;
+  wire [31:0] if_ifid_inst_addr;
+
+  // IF/ID to ID
+  wire [31:0] ifid_id_inst;
+  wire [31:0] ifid_id_inst_addr;
+
+  // ID to Regs
+  wire [ 4:0] id_regs_rs1_addr;
+  wire [ 4:0] id_regs_rs2_addr;
+
+  // Regs to ID
+  wire [31:0] regs_id_rs1_data;
+  wire [31:0] regs_id_rs2_data;
+
+  // ID to ID/EX
+  wire [31:0] id_idex_inst;
+  wire [31:0] id_idex_inst_addr;
+  wire [31:0] id_idex_op1;
+  wire [31:0] id_idex_op2;
+  wire [ 4:0] id_idex_rd_addr;
+  wire        id_idex_rd_wen;
+
+  // ID/EX to EX
+  wire [31:0] idex_ex_inst;
+  wire [31:0] idex_ex_inst_addr;
+  wire [31:0] idex_ex_op1;
+  wire [31:0] idex_ex_op2;
+  wire [ 4:0] idex_ex_rd_addr;
+  wire        idex_ex_rd_wen;
+
+  // EX to Regs
+  wire [ 4:0] ex_regs_rd_addr;
+  wire [31:0] ex_regs_rd_data;
+  wire        ex_regs_rd_wen;
+
+  // EX to Control
+  wire [31:0] ex_ctrl_jump_addr;
+  wire        ex_ctrl_jump_en;
+  wire        ex_ctrl_hold_flag;
+
+  // Control to PC, IF/ID, ID/EX
+  wire [31:0] ctrl_pc_jump_addr;
+  wire        ctrl_pc_jump_en;
+  wire        ctrl_hold_flag;
+
+  // Program Counter (PC)
   pc_reg pc_reg_inst (
-      .clk (clk),
-      .rst (rst),
-      .pc_o(pc_reg_o)
+      .clk        (clk),
+      .rst        (rst),
+      .jump_addr_i(ctrl_pc_jump_addr),
+      .jump_en_i  (ctrl_pc_jump_en),
+      .pc_o       (pc_if_addr)
   );
-  //   取址模块例化
+
+  // Instruction Fetch (IF)
   iF if_inst (
-      .pc_addr_i(pc_reg_o),
-      .rom_inst_i(inst_i),
+      .pc_addr_i    (pc_if_addr),
+      .rom_inst_i   (inst_i),
       .if2rom_addr_o(inst_addr_o),
-      .inst_addr_o(if_inst_addr_o),
-      .inst_o(if_inst_o)
+      .inst_addr_o  (if_ifid_inst_addr),
+      .inst_o       (if_ifid_inst)
   );
-  //   if_id寄存器例化
+
+  // IF/ID Pipeline Register
   if_id if_id_inst (
-      .clk(clk),
-      .rst(rst),
-      .inst_i(if_inst_o),
-      .inst_addr_i(if_inst_addr_o),
-      .inst_o(if_id_inst_o),
-      .inst_addr_o(if_id_inst_addr_o),
-      .jump_en_i(control_jump_en_o)
+      .clk        (clk),
+      .rst        (rst),
+      .inst_i     (if_ifid_inst),
+      .inst_addr_i(if_ifid_inst_addr),
+      .hold_flag_i(ctrl_hold_flag),
+      .inst_o     (ifid_id_inst),
+      .inst_addr_o(ifid_id_inst_addr)
   );
-  //   译址模块例化
+
+  // Instruction Decode (ID)
   id id_inst (
-      .inst_i     (if_id_inst_o),
-      .inst_addr_i(if_id_inst_addr_o),
-      .rs1_addr_o (id_rs1_addr_o),
-      .rs2_addr_o (id_rs2_addr_o),
-      .rs1_data_i (id_rs1_data_i),
-      .rs2_data_i (id_rs2_data_i),
-      .inst_o     (id_inst_o),
-      .inst_addr_o(id_inst_addr_o),
-      .op1_o      (id_op1_o),
-      .op2_o      (id_op2_o),
-      .rd_addr_o  (id_rd_addr_o),
-      .reg_wen    (id_reg_wen)
+      .inst_i     (ifid_id_inst),
+      .inst_addr_i(ifid_id_inst_addr),
+      .rs1_addr_o (id_regs_rs1_addr),
+      .rs2_addr_o (id_regs_rs2_addr),
+      .rs1_data_i (regs_id_rs1_data),
+      .rs2_data_i (regs_id_rs2_data),
+      .inst_o     (id_idex_inst),
+      .inst_addr_o(id_idex_inst_addr),
+      .op1_o      (id_idex_op1),
+      .op2_o      (id_idex_op2),
+      .rd_addr_o  (id_idex_rd_addr),
+      .reg_wen    (id_idex_rd_wen)
   );
-  // id_ex寄存器例化
+
+  // ID/EX Pipeline Register
   id_ex id_ex_inst (
-      .clk(clk),
-      .rst(rst),
-      .inst_i(id_inst_o),
-      .inst_addr_i(id_inst_addr_o),
-      .op1_i(id_op1_o),
-      .op2_i(id_op2_o),
-      .rd_addr_i(id_rd_addr_o),
-      .reg_wen_i(id_reg_wen),
-      .inst_o(id_ex_inst_o),
-      .inst_addr_o(id_ex_inst_addr_o),
-      .op1_o(id_ex_op1_o),
-      .op2_o(id_ex_op2_o),
-      .rd_addr_o(id_ex_rd_addr_o),
-      .reg_wen_o(id_ex_reg_wen_o),
-      .jump_en_i(control_jump_en_o)
+      .clk        (clk),
+      .rst        (rst),
+      .inst_i     (id_idex_inst),
+      .inst_addr_i(id_idex_inst_addr),
+      .op1_i      (id_idex_op1),
+      .op2_i      (id_idex_op2),
+      .rd_addr_i  (id_idex_rd_addr),
+      .reg_wen_i  (id_idex_rd_wen),
+      .hold_flag_i(ctrl_hold_flag),
+      .inst_o     (idex_ex_inst),
+      .inst_addr_o(idex_ex_inst_addr),
+      .op1_o      (idex_ex_op1),
+      .op2_o      (idex_ex_op2),
+      .rd_addr_o  (idex_ex_rd_addr),
+      .reg_wen_o  (idex_ex_rd_wen)
   );
-  // 执行模块例化
+
+  // Execute (EX)
   ex ex_inst (
-      .inst_i     (id_ex_inst_o),
-      .inst_addr_i(id_ex_inst_addr_o),
-      .op1_i      (id_ex_op1_o),
-      .op2_i      (id_ex_op2_o),
-      .rd_addr_i  (id_ex_rd_addr_o),
-      .rd_wen_i   (id_ex_reg_wen_o),
-      .rd_addr_o  (ex_rd_addr_o),
-      .rd_data_o  (ex_rd_data_o),
-      .rd_wen_o   (rd_wen_o),
-      .jump_addr_o(ex_jump_addr_o),
-      .jump_en_o  (ex_jump_en_o),
-      .hold_flag_o(ex_hold_flag_o)
+      .inst_i     (idex_ex_inst),
+      .inst_addr_i(idex_ex_inst_addr),
+      .op1_i      (idex_ex_op1),
+      .op2_i      (idex_ex_op2),
+      .rd_addr_i  (idex_ex_rd_addr),
+      .rd_wen_i   (idex_ex_rd_wen),
+      .rd_addr_o  (ex_regs_rd_addr),
+      .rd_data_o  (ex_regs_rd_data),
+      .rd_wen_o   (ex_regs_rd_wen),
+      .jump_addr_o(ex_ctrl_jump_addr),
+      .jump_en_o  (ex_ctrl_jump_en),
+      .hold_flag_o(ex_ctrl_hold_flag)
   );
-  // 控制模块例化
+
+  // Control Unit
   control control_inst (
-      .jump_addr_i   (ex_jump_addr_o),
-      .jump_en_i     (ex_jump_en_o),
-      .hold_flag_ex_i(ex_hold_flag_o),
-      .jump_addr_o   (control_jump_addr_o),
-      .jump_en_o     (control_jump_en_o),
-      .hold_flag_o   (control_hold_flag_o)
+      .jump_addr_i   (ex_ctrl_jump_addr),
+      .jump_en_i     (ex_ctrl_jump_en),
+      .hold_flag_ex_i(ex_ctrl_hold_flag),
+      .jump_addr_o   (ctrl_pc_jump_addr),
+      .jump_en_o     (ctrl_pc_jump_en),
+      .hold_flag_o   (ctrl_hold_flag)
   );
-  //   通用寄存器例化
+
+  // Register File
   regs regs_inst (
-      .clk(clk),
-      .rst(rst),
-      .reg1_addr_i(id_rs1_addr_o),
-      .reg2_addr_i(id_rs2_addr_o),
-      .reg1_data_o(id_rs1_data_i),
-      .reg2_data_o(id_rs2_data_i),
-      .reg_waddr_i(ex_rd_addr_o),
-      .reg_wdata_i(ex_rd_data_o),
-      .reg_wen(rd_wen_o)
+      .clk        (clk),
+      .rst        (rst),
+      .reg1_addr_i(id_regs_rs1_addr),
+      .reg2_addr_i(id_regs_rs2_addr),
+      .reg1_data_o(regs_id_rs1_data),
+      .reg2_data_o(regs_id_rs2_data),
+      .reg_waddr_i(ex_regs_rd_addr),
+      .reg_wdata_i(ex_regs_rd_data),
+      .reg_wen    (ex_regs_rd_wen)
   );
+
 endmodule
