@@ -10,7 +10,7 @@ module id_ex (
     input wire [4:0] rd_addr_i,
     input wire reg_wen_i,
     // from control
-    input wire jump_en_i;
+    input wire jump_en_i,
     // to ex
     output wire [31:0] inst_o,
     output wire [31:0] inst_addr_o,
