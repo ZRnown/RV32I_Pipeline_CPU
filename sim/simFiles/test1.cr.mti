@@ -1,40 +1,58 @@
-E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/top/cpu_top.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/top/cpu_top.v
+E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/if_id.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/if_id.v
 Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
--- Compiling module cpu_top
+-- Compiling module if_id
 
 Top level modules:
-	cpu_top
+	if_id
 
-} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/fetch/dff_set.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/fetch/dff_set.v
+} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id_ex.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id_ex.v
 Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
--- Compiling module dff_set
+-- Compiling module id_ex
 
 Top level modules:
-	dff_set
+	id_ex
 
-} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/common/defines.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/common/defines.v
+} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/regs.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/regs.v
 Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
+-- Compiling module regs
 
-} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/top/cpu_top_soc.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/top/cpu_top_soc.v
+Top level modules:
+	regs
+
+} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/cpu_top_soc.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/cpu_top_soc.v
 Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
 -- Compiling module cpu_top_soc
 
 Top level modules:
 	cpu_top_soc
 
-} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/fetch/if.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/fetch/if.v
+} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/execute/ex.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/execute/ex.v
 Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
--- Compiling module iF
+-- Compiling module ex
 
 Top level modules:
-	iF
+	ex
 
-} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/fetch/imem.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/fetch/imem.v
+} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/pc_reg.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/pc_reg.v
 Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
--- Compiling module imem
+-- Compiling module pc_reg
 
 Top level modules:
-	imem
+	pc_reg
+
+} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/common/control.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/common/control.v
+Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
+-- Compiling module control
+
+Top level modules:
+	control
+
+} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/utils/dff_set.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/utils/dff_set.v
+Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
+-- Compiling module dff_set
+
+Top level modules:
+	dff_set
 
 } {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/sim/testcases/cpu_top_tb.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/sim/testcases/cpu_top_tb.v
 Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
@@ -43,39 +61,28 @@ Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
 Top level modules:
 	tb
 
-} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/fetch/if_id.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/fetch/if_id.v
+} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/common/defines.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/common/defines.v
 Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
--- Compiling module if_id
+
+} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id.v
+Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
+-- Compiling module id
 
 Top level modules:
-	if_id
+	id
 
-} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/decode/id_ex.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/decode/id_ex.v
+} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/if.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/if.v
 Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
--- Compiling module id_ex
+-- Compiling module iF
 
 Top level modules:
-	id_ex
+	iF
 
-} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/execute/alu.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/execute/alu.v
+} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/imem.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/imem.v
 Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
--- Compiling module ALU
+-- Compiling module imem
 
 Top level modules:
-	ALU
-
-} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/execute/ex.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/execute/ex.v
-Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
--- Compiling module ex
-
-Top level modules:
-	ex
-
-} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/fetch/pc_reg.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/fetch/pc_reg.v
-Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
--- Compiling module pc_reg
-
-Top level modules:
-	pc_reg
+	imem
 
 } {} {}}
