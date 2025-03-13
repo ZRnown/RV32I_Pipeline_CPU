@@ -1,7 +1,5 @@
 # RV32I_Pipeline_CPU
 
-## 项目目录结构
-![img](./docs/1.png)
 ## 项目说明
 
 # RISC-V CPU 项目待办事项
