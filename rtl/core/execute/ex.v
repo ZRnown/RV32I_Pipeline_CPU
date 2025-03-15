@@ -33,7 +33,7 @@ module ex (
   wire op1_i_less_op2_i_signed = ($signed(op1_i) < $signed(op2_i)) ? 1'b1 : 1'b0;
   wire op1_i_less_op2_i_unsigned = (op1_i < op2_i) ? 1'b1 : 1'b0;
   // tpye I
-  wire [31:0] SRA_mask = (32'hffff_ffff) >> shamt[4:0];
+  wire [31:0] SRA_mask = (32'hffff_ffff) >> op2_i[4:0];
   
   always @(*) begin
     case (opcode)
@@ -63,7 +63,7 @@ module ex (
             rd_wen_o  = 1'b1;
           end
 		  `INST_ORI: begin
-            rd_data_o = op1_i + op2_i;
+            rd_data_o = op1_i | op2_i;
             rd_addr_o = rd_addr_i;
             rd_wen_o  = 1'b1;
           end
@@ -82,11 +82,12 @@ module ex (
 			  rd_data_o = ((op1_i >> shamt) & SRA_mask) | ({32{op1_i[31]}} & (~SRA_mask));
               rd_addr_o = rd_addr_i;
               rd_wen_o  = 1'b1;
-			end else begin
+			end
+			else begin
 			  rd_data_o = op1_i >> op2_i[4:0];
               rd_addr_o = rd_addr_i;
               rd_wen_o  = 1'b1;
-		  end
+		   end
 		  end
           default:begin
             rd_data_o = 32'b0;
@@ -101,14 +102,59 @@ module ex (
         hold_flag_o = 1'b0;
         case (funct3)
           `INST_ADD_SUB: begin
-            if (funct7 == 7'b000_0000) begin
+            if (funct7[5] == 1'b0) begin
               rd_data_o = op1_i + op2_i;
-            end else begin
-              rd_data_o = op1_i - op2_i;
+			  rd_addr_o = rd_addr_i;
+              rd_wen_o  = 1'b1;
             end
-            rd_addr_o = rd_addr_i;
-            rd_wen_o  = 1'b1;
+			else begin
+              rd_data_o = op1_i - op2_i;
+              rd_addr_o = rd_addr_i;
+              rd_wen_o  = 1'b1;
+			end
           end
+		  `INST_SLL: begin
+              rd_data_o = op1_i << op2_i[4:0];
+			  rd_addr_o = rd_addr_i;
+              rd_wen_o  = 1'b1;
+		  end
+		  `INST_SLT: begin
+              rd_data_o = {30'b0, op1_i_less_op2_i_signed};
+			  rd_addr_o = rd_addr_i;
+              rd_wen_o  = 1'b1;
+		  end
+		  `INST_SLTU: begin
+              rd_data_o = {30'b0, op1_i_less_op2_i_unsigned};
+			  rd_addr_o = rd_addr_i;
+              rd_wen_o  = 1'b1;
+		  end
+		  `INST_XOR: begin
+              rd_data_o = op1_i ^ op2_i;
+			  rd_addr_o = rd_addr_i;
+              rd_wen_o  = 1'b1;
+		  end
+		  `INST_OR: begin
+              rd_data_o = op1_i | op2_i;
+			  rd_addr_o = rd_addr_i;
+              rd_wen_o  = 1'b1;
+		  end
+		  `INST_AND: begin
+              rd_data_o = op1_i & op2_i;
+			  rd_addr_o = rd_addr_i;
+              rd_wen_o  = 1'b1;
+		  end
+		  `INST_SR: begin
+              if (funct7[5] == 1'b1) begin
+			  rd_data_o = ((op1_i >> op2_i[4:0]) & SRA_mask) | ({32{op1_i[31]}} & (~SRA_mask));
+              rd_addr_o = rd_addr_i;
+              rd_wen_o  = 1'b1;
+			end
+			else begin
+			  rd_data_o = op1_i >> op2_i[4:0];
+              rd_addr_o = rd_addr_i;
+              rd_wen_o  = 1'b1;
+		   end
+		  end
           default: begin
             rd_addr_o = 5'b0;
             rd_data_o = 32'b0;
