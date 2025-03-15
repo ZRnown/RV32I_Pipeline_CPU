@@ -1,4 +1,4 @@
-// id => instruction decode 译码模块
+// id => instruction decode 译码阶段
 `include "../common/defines.v"
 module id (
     // from if_id
@@ -34,7 +34,7 @@ module id (
     case (opcode)
       `INST_TYPE_I: begin
         case (funct3)
-          `INST_ADDI,`INST_SLTI,`INST_SLTIU,`INST_XORI,`INST_ORI,`INST_ANDI: begin
+          `INST_ADDI, `INST_SLTI, `INST_SLTIU, `INST_XORI, `INST_ORI, `INST_ANDI: begin
             rs1_addr_o = rs1;  // 寄存器1
             rs2_addr_o = 5'b0;
             op1_o = rs1_data_i;
@@ -42,14 +42,14 @@ module id (
             rd_addr_o = rd;  // 目标寄存器
             reg_wen = 1'b1;
           end
-		  `INST_SLLI,`INST_SRI:begin
-		    rs1_addr_o = rs1;  // 寄存器1
+          `INST_SLLI, `INST_SRI: begin
+            rs1_addr_o = rs1;  // 寄存器1
             rs2_addr_o = 5'b0;
             op1_o = rs1_data_i;
             op2_o = {27'b0, shamt};
             rd_addr_o = rd;  // 目标寄存器
             reg_wen = 1'b1;
-		  end
+          end
           default: begin
             rs1_addr_o = 5'b0;
             rs2_addr_o = 5'b0;

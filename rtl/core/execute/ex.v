@@ -1,20 +1,25 @@
+// 执行阶段
 `include "../common/defines.v"
 module ex (
     // from id_ex
-    input wire [31:0] inst_i,
-    input wire [31:0] inst_addr_i,
-    input wire [31:0] op1_i,
-    input wire [31:0] op2_i,
-    input wire [4:0] rd_addr_i,
-    input wire rd_wen_i,
-    // to regs
-    output reg [4:0] rd_addr_o,
-    output reg [31:0] rd_data_o,
-    output reg rd_wen_o,
+    input  wire [31:0] inst_i,
+    input  wire [31:0] inst_addr_i,
+    input  wire [31:0] op1_i,
+    input  wire [31:0] op2_i,
+    input  wire [ 4:0] rd_addr_i,
+    input  wire        rd_wen_i,
+    // to ex_mem
+    output reg  [ 4:0] rd_addr_o,
+    output reg  [31:0] rd_data_o,
+    output reg         rd_wen_o,
+    output reg  [31:0] mem_addr_o,   // 访存地址（如 LW/SW 的地址）
+    output reg  [31:0] mem_data_o,   // 写入内存的数据（SW 指令）
+    output reg         mem_we_o,     // 内存写使能（1: Store, 0: Load 或其他）
+    output reg         mem_re_o,     // 内存读使能（1: Load）
     // to control
-    output reg [31:0] jump_addr_o,
-    output reg jump_en_o,
-    output reg hold_flag_o
+    output reg  [31:0] jump_addr_o,
+    output reg         jump_en_o,
+    output reg         hold_flag_o
 );
   // 指令字段解析
   wire [6:0] opcode = inst_i[6:0];
@@ -34,7 +39,7 @@ module ex (
   wire op1_i_less_op2_i_unsigned = (op1_i < op2_i) ? 1'b1 : 1'b0;
   // tpye I
   wire [31:0] SRA_mask = (32'hffff_ffff) >> op2_i[4:0];
-  
+
   always @(*) begin
     case (opcode)
       `INST_TYPE_I: begin
@@ -47,49 +52,48 @@ module ex (
             rd_addr_o = rd_addr_i;
             rd_wen_o  = 1'b1;
           end
-		  `INST_SLTI: begin
+          `INST_SLTI: begin
             rd_data_o = {30'b0, op1_i_equal_op2_i};
             rd_addr_o = rd_addr_i;
             rd_wen_o  = 1'b1;
           end
-		  `INST_SLTIU: begin
+          `INST_SLTIU: begin
             rd_data_o = {30'b0, op1_i_less_op2_i_unsigned};
             rd_addr_o = rd_addr_i;
             rd_wen_o  = 1'b1;
           end
-		  `INST_XORI: begin
+          `INST_XORI: begin
             rd_data_o = op1_i ^ op2_i;
             rd_addr_o = rd_addr_i;
             rd_wen_o  = 1'b1;
           end
-		  `INST_ORI: begin
+          `INST_ORI: begin
             rd_data_o = op1_i | op2_i;
             rd_addr_o = rd_addr_i;
             rd_wen_o  = 1'b1;
           end
-		  `INST_ANDI: begin
+          `INST_ANDI: begin
             rd_data_o = op1_i & op2_i;
             rd_addr_o = rd_addr_i;
             rd_wen_o  = 1'b1;
           end
-		  `INST_SLLI: begin
+          `INST_SLLI: begin
             rd_data_o = op1_i << shamt;
             rd_addr_o = rd_addr_i;
             rd_wen_o  = 1'b1;
           end
-		  `INST_SRI:begin
-		    if (funct7[5] == 1'b1) begin
-			  rd_data_o = ((op1_i >> shamt) & SRA_mask) | ({32{op1_i[31]}} & (~SRA_mask));
+          `INST_SRI: begin
+            if (funct7[5] == 1'b1) begin
+              rd_data_o = ((op1_i >> shamt) & SRA_mask) | ({32{op1_i[31]}} & (~SRA_mask));
               rd_addr_o = rd_addr_i;
               rd_wen_o  = 1'b1;
-			end
-			else begin
-			  rd_data_o = op1_i >> op2_i[4:0];
+            end else begin
+              rd_data_o = op1_i >> op2_i[4:0];
               rd_addr_o = rd_addr_i;
               rd_wen_o  = 1'b1;
-		   end
-		  end
-          default:begin
+            end
+          end
+          default: begin
             rd_data_o = 32'b0;
             rd_addr_o = 5'b0;
             rd_wen_o  = 1'b0;
@@ -104,57 +108,55 @@ module ex (
           `INST_ADD_SUB: begin
             if (funct7[5] == 1'b0) begin
               rd_data_o = op1_i + op2_i;
-			  rd_addr_o = rd_addr_i;
+              rd_addr_o = rd_addr_i;
               rd_wen_o  = 1'b1;
-            end
-			else begin
+            end else begin
               rd_data_o = op1_i - op2_i;
               rd_addr_o = rd_addr_i;
               rd_wen_o  = 1'b1;
-			end
+            end
           end
-		  `INST_SLL: begin
-              rd_data_o = op1_i << op2_i[4:0];
-			  rd_addr_o = rd_addr_i;
-              rd_wen_o  = 1'b1;
-		  end
-		  `INST_SLT: begin
-              rd_data_o = {30'b0, op1_i_less_op2_i_signed};
-			  rd_addr_o = rd_addr_i;
-              rd_wen_o  = 1'b1;
-		  end
-		  `INST_SLTU: begin
-              rd_data_o = {30'b0, op1_i_less_op2_i_unsigned};
-			  rd_addr_o = rd_addr_i;
-              rd_wen_o  = 1'b1;
-		  end
-		  `INST_XOR: begin
-              rd_data_o = op1_i ^ op2_i;
-			  rd_addr_o = rd_addr_i;
-              rd_wen_o  = 1'b1;
-		  end
-		  `INST_OR: begin
-              rd_data_o = op1_i | op2_i;
-			  rd_addr_o = rd_addr_i;
-              rd_wen_o  = 1'b1;
-		  end
-		  `INST_AND: begin
-              rd_data_o = op1_i & op2_i;
-			  rd_addr_o = rd_addr_i;
-              rd_wen_o  = 1'b1;
-		  end
-		  `INST_SR: begin
-              if (funct7[5] == 1'b1) begin
-			  rd_data_o = ((op1_i >> op2_i[4:0]) & SRA_mask) | ({32{op1_i[31]}} & (~SRA_mask));
+          `INST_SLL: begin
+            rd_data_o = op1_i << op2_i[4:0];
+            rd_addr_o = rd_addr_i;
+            rd_wen_o  = 1'b1;
+          end
+          `INST_SLT: begin
+            rd_data_o = {30'b0, op1_i_less_op2_i_signed};
+            rd_addr_o = rd_addr_i;
+            rd_wen_o  = 1'b1;
+          end
+          `INST_SLTU: begin
+            rd_data_o = {30'b0, op1_i_less_op2_i_unsigned};
+            rd_addr_o = rd_addr_i;
+            rd_wen_o  = 1'b1;
+          end
+          `INST_XOR: begin
+            rd_data_o = op1_i ^ op2_i;
+            rd_addr_o = rd_addr_i;
+            rd_wen_o  = 1'b1;
+          end
+          `INST_OR: begin
+            rd_data_o = op1_i | op2_i;
+            rd_addr_o = rd_addr_i;
+            rd_wen_o  = 1'b1;
+          end
+          `INST_AND: begin
+            rd_data_o = op1_i & op2_i;
+            rd_addr_o = rd_addr_i;
+            rd_wen_o  = 1'b1;
+          end
+          `INST_SR: begin
+            if (funct7[5] == 1'b1) begin
+              rd_data_o = ((op1_i >> op2_i[4:0]) & SRA_mask) | ({32{op1_i[31]}} & (~SRA_mask));
               rd_addr_o = rd_addr_i;
               rd_wen_o  = 1'b1;
-			end
-			else begin
-			  rd_data_o = op1_i >> op2_i[4:0];
+            end else begin
+              rd_data_o = op1_i >> op2_i[4:0];
               rd_addr_o = rd_addr_i;
               rd_wen_o  = 1'b1;
-		   end
-		  end
+            end
+          end
           default: begin
             rd_addr_o = 5'b0;
             rd_data_o = 32'b0;
