@@ -183,6 +183,26 @@ module ex (
             jump_en_o   = ~op1_i_equal_op2_i;
             hold_flag_o = 1'b0;
           end
+		  `INST_BLT: begin
+            jump_addr_o = (inst_addr_i + jump_imm) & {32{(op1_i_less_op2_i_signed)}};
+            jump_en_o   = op1_i_less_op2_i_signed;
+            hold_flag_o = 1'b0;
+          end
+		  `INST_BGE: begin
+            jump_addr_o = (inst_addr_i + jump_imm) & {32{(~op1_i_less_op2_i_signed)}};
+            jump_en_o   = ~op1_i_less_op2_i_signed;
+            hold_flag_o = 1'b0;
+          end
+		  `INST_BLTU: begin
+            jump_addr_o = (inst_addr_i + jump_imm) & {32{(op1_i_less_op2_i_unsigned)}};
+            jump_en_o   = op1_i_less_op2_i_unsigned;
+            hold_flag_o = 1'b0;
+          end
+		  `INST_BGEU: begin
+            jump_addr_o = (inst_addr_i + jump_imm) & {32{(~op1_i_less_op2_i_unsigned)}};
+            jump_en_o   = ~op1_i_less_op2_i_unsigned;
+            hold_flag_o = 1'b0;
+          end
           default: begin
             jump_addr_o = 32'b0;
             jump_en_o   = 1'b0;
@@ -213,21 +233,37 @@ module ex (
         endcase
       end
       `INST_JAL: begin
-        rd_addr_o = rd_addr_i;
         rd_data_o = inst_addr_i + 32'h4;
-        jump_addr_o = op1_i + inst_addr_i;
+        rd_addr_o = rd_addr_i;
         rd_wen_o = 1'b1;
+		jump_addr_o = op1_i + inst_addr_i;
+        jump_en_o = 1'b1;
+        hold_flag_o = 1'b0;
+      end
+	  `INST_JALR: begin
+        rd_data_o = inst_addr_i + 32'h4;
+        rd_addr_o = rd_addr_i;
+        rd_wen_o = 1'b1;
+        jump_addr_o = op1_i + op2_i;
         jump_en_o = 1'b1;
         hold_flag_o = 1'b0;
       end
       `INST_LUI: begin
-        rd_addr_o = rd_addr_i;
         rd_data_o = op1_i;
+        rd_addr_o = rd_addr_i;
         rd_wen_o = 1'b1;
         jump_addr_o = 32'b0;
         jump_en_o = 1'b0;
         hold_flag_o = 1'b0;
       end
+	  `INST_AUIPC:begin
+	    rd_data_o = op1_i + op2_i;
+        rd_addr_o = rd_addr_i;
+        rd_wen_o = 1'b1;
+        jump_addr_o = 32'b0;
+        jump_en_o = 1'b0;
+        hold_flag_o = 1'b0;
+	  end
       default: begin
         rd_data_o = 32'b0;
         rd_addr_o = 5'b0;
