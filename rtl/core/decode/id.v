@@ -1,24 +1,32 @@
-// id => instruction decode 译码模块
+// id => instruction decode 译码阶段
 `include "../common/defines.v"
 module id (
     // from if_id
-    input wire [31:0] inst_i,
-    input wire [31:0] inst_addr_i,
+    input  wire [31:0] inst_i,
+    input  wire [31:0] inst_addr_i,
+    // from ex (数据相关性)
+    input  wire [31:0] ex_rd_data,   // EX 阶段的 ALU 计算结果
+    input  wire [ 4:0] ex_rd_addr,   // EX 阶段的目标寄存器地址
+    input  wire        ex_reg_wen,   // EX 阶段的写使能
+    // from mem (数据相关性)
+    input  wire [31:0] mem_rd_data,  // MEM 阶段的数据（例如加载指令的结果）
+    input  wire [ 4:0] mem_rd_addr,  // MEM 阶段的目标寄存器地址
+    input  wire        mem_reg_wen,  // MEM 阶段的写使能
     // to regs
-    output reg [4:0] rs1_addr_o,
-    output reg [4:0] rs2_addr_o,
+    output reg  [ 4:0] rs1_addr_o,
+    output reg  [ 4:0] rs2_addr_o,
     // from regs
-    input wire [31:0] rs1_data_i,
-    input wire [31:0] rs2_data_i,
+    input  wire [31:0] rs1_data_i,
+    input  wire [31:0] rs2_data_i,
     // to id_ex 
-    output reg [31:0] inst_o,
-    output reg [31:0] inst_addr_o,
-    output reg [31:0] op1_o,
-    output reg [31:0] op2_o,
-    output reg [4:0] rd_addr_o,
-    output reg reg_wen
+    output reg  [31:0] inst_o,
+    output reg  [31:0] inst_addr_o,
+    output reg  [31:0] op1_o,
+    output reg  [31:0] op2_o,
+    output reg  [ 4:0] rd_addr_o,
+    output reg         reg_wen
 );
-
+  // 指令解析
   wire [ 6:0] opcode = inst_i[6:0];
   wire [11:0] imm = inst_i[31:20];
   wire [ 4:0] rs1 = inst_i[19:15];
@@ -27,29 +35,42 @@ module id (
   wire [ 2:0] funct3 = inst_i[14:12];
   wire [ 6:0] funct7 = inst_i[31:25];
   wire [ 4:0] shamt = inst_i[24:20];
-
+  // 前递逻辑
+  reg [31:0] rs1_data, rs2_data;
   always @(*) begin
+    // rs1 前递
+    if (ex_reg_wen && ex_rd_addr != 5'b0 && ex_rd_addr == rs1)
+      rs1_data = ex_rd_data;  // 从 EX 模块前递
+    else if (mem_reg_wen && mem_rd_addr != 5'b0 && mem_rd_addr == rs1)
+      rs1_data = mem_rd_data;  // 从 MEM 模块前递
+    else rs1_data = rs1_data_i;  // 从 regs 读取（包含 WB 旁路）
+    // rs2 前递
+    if (ex_reg_wen && ex_rd_addr != 5'b0 && ex_rd_addr == rs2)
+      rs2_data = ex_rd_data;  // 从 EX 模块前递
+    else if (mem_reg_wen && mem_rd_addr != 5'b0 && mem_rd_addr == rs2)
+      rs2_data = mem_rd_data;  // 从 MEM 模块前递
+    else rs2_data = rs2_data_i;  // 从 regs 读取（包含 WB 旁路）
     inst_o = inst_i;
     inst_addr_o = inst_addr_i;
     case (opcode)
       `INST_TYPE_I: begin
         case (funct3)
-          `INST_ADDI,`INST_SLTI,`INST_SLTIU,`INST_XORI,`INST_ORI,`INST_ANDI: begin
+          `INST_ADDI, `INST_SLTI, `INST_SLTIU, `INST_XORI, `INST_ORI, `INST_ANDI: begin
             rs1_addr_o = rs1;  // 寄存器1
             rs2_addr_o = 5'b0;
-            op1_o = rs1_data_i;
+            op1_o = rs1_data;
             op2_o = {{20{imm[11]}}, imm};
             rd_addr_o = rd;  // 目标寄存器
             reg_wen = 1'b1;
           end
-		  `INST_SLLI,`INST_SRI:begin
-		    rs1_addr_o = rs1;  // 寄存器1
+          `INST_SLLI, `INST_SRI: begin
+            rs1_addr_o = rs1;  // 寄存器1
             rs2_addr_o = 5'b0;
-            op1_o = rs1_data_i;
+            op1_o = rs1_data;
             op2_o = {27'b0, shamt};
             rd_addr_o = rd;  // 目标寄存器
             reg_wen = 1'b1;
-		  end
+          end
           default: begin
             rs1_addr_o = 5'b0;
             rs2_addr_o = 5'b0;
@@ -65,8 +86,8 @@ module id (
           `INST_ADD_SUB,`INST_SLL,`INST_SLT,`INST_SLTU,`INST_XOR,`INST_SR,`INST_OR,`INST_AND: begin
             rs1_addr_o = rs1;  // 寄存器1
             rs2_addr_o = rs2;  // 寄存器2
-            op1_o = rs1_data_i;
-            op2_o = rs2_data_i;
+            op1_o = rs1_data;
+            op2_o = rs2_data;
             rd_addr_o = rd;  // 目标寄存器
             reg_wen = 1'b1;
           end
@@ -85,8 +106,8 @@ module id (
           `INST_BNE, `INST_BEQ: begin
             rs1_addr_o = rs1;  // 寄存器1
             rs2_addr_o = rs2;  // 寄存器2
-            op1_o      = rs1_data_i;
-            op2_o      = rs2_data_i;
+            op1_o      = rs1_data;
+            op2_o      = rs2_data;
             rd_addr_o  = 5'b0;
             reg_wen    = 1'b0;
           end

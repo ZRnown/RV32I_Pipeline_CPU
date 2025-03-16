@@ -19,7 +19,7 @@ module id_ex (
     output wire [4:0] rd_addr_o,
     output wire reg_wen_o
 );
-  dff_set #(32) dff1 (
+  dff_set_hold #(32) dff1 (
       clk,
       rst,
       hold_flag_i,
@@ -27,7 +27,7 @@ module id_ex (
       inst_i,
       inst_o
   );
-  dff_set #(32) dff2 (
+  dff_set_hold #(32) dff2 (
       clk,
       rst,
       hold_flag_i,
@@ -35,7 +35,7 @@ module id_ex (
       inst_addr_i,
       inst_addr_o
   );
-  dff_set #(32) dff3 (
+  dff_set_hold #(32) dff3 (
       clk,
       rst,
       hold_flag_i,
@@ -43,7 +43,7 @@ module id_ex (
       op1_i,
       op1_o
   );
-  dff_set #(32) dff4 (
+  dff_set_hold #(32) dff4 (
       clk,
       rst,
       hold_flag_i,
@@ -51,7 +51,7 @@ module id_ex (
       op2_i,
       op2_o
   );
-  dff_set #(5) dff5 (
+  dff_set_hold #(5) dff5 (
       clk,
       rst,
       hold_flag_i,
@@ -59,7 +59,7 @@ module id_ex (
       rd_addr_i,
       rd_addr_o
   );
-  dff_set #(1) dff6 (
+  dff_set_hold #(1) dff6 (
       clk,
       rst,
       hold_flag_i,

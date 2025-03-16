@@ -13,7 +13,7 @@ module if_id (
     output wire [31:0] inst_o,
     output wire [31:0] inst_addr_o
 );
-  dff_set #(32) dff1 (
+  dff_set_hold #(32) dff1 (
       clk,
       rst,
       hold_flag_i,
@@ -21,7 +21,7 @@ module if_id (
       inst_i,
       inst_o
   );
-  dff_set #(32) dff2 (
+  dff_set_hold #(32) dff2 (
       clk,
       rst,
       hold_flag_i,
