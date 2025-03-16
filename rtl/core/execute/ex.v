@@ -8,14 +8,18 @@ module ex (
     input  wire [31:0] op2_i,
     input  wire [ 4:0] rd_addr_i,
     input  wire        rd_wen_i,
+    input  wire [ 2:0] mem_size_i,
+    input  wire        mem_we_i,
+    input  wire        mem_re_i,
     // to ex_mem
     output reg  [ 4:0] rd_addr_o,
     output reg  [31:0] rd_data_o,
     output reg         rd_wen_o,
     output reg  [31:0] mem_addr_o,   // 访存地址（如 LW/SW 的地址）
     output reg  [31:0] mem_data_o,   // 写入内存的数据（SW 指令）
-    output reg         mem_we_o,     // 内存写使能（1: Store, 0: Load 或其他）
-    output reg         mem_re_o,     // 内存读使能（1: Load）
+    output wire [ 2:0] mem_size_o,
+    output wire        mem_we_o,
+    output wire        mem_re_o,
     // to control
     output reg  [31:0] jump_addr_o,
     output reg         jump_en_o,
@@ -183,6 +187,28 @@ module ex (
             jump_addr_o = 32'b0;
             jump_en_o   = 1'b0;
             hold_flag_o = 1'b0;
+          end
+        endcase
+      end
+      `INST_TYPE_S: begin
+        case (funct3)
+          `INST_SB: begin
+            mem_we_o = mem_we_i;
+            mem_re_o = mem_re_i;
+            mem_addr_o;
+            mem_data_o;
+          end
+          default: begin
+          end
+        endcase
+      end
+      `INST_TYPE_L: begin
+        case (funct3)
+          `INST_LB: begin
+
+          end
+          default: begin
+
           end
         endcase
       end
