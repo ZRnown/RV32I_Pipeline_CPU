@@ -69,4 +69,11 @@ module ex_mem (
       mem_re_i,
       mem_re_o
   );
+  dff_set #(3) dff8 (
+      clk,
+      rst,
+      3'b0,
+      mem_size_i,
+      mem_size_o
+  );
 endmodule

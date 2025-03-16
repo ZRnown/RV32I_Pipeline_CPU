@@ -14,9 +14,8 @@ module tb;
     rst <= 1'b1;
   end
   initial begin
-    $readmemh(
-        "E:\\Files\\Electron\\FPGA\\RV32I_Pipeline_CPU\\sim\\testcases\\inst_test\\rv32ui-p-addi.txt",
-        tb.u_cpu_top_soc.u_rom.ROM);
+    $readmemb("E:\\Files\\Electron\\FPGA\\RV32I_Pipeline_CPU\\sim\\testcases\\inst_data_ADD.txt",
+              tb.u_cpu_top_soc.u_rom.ROM);
   end
   initial begin
     // while (1) begin
