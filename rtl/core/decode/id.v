@@ -25,7 +25,8 @@ module id (
     output reg [31:0] op2_o,
     output reg [4:0] rd_addr_o,
     output reg reg_wen,
-    output reg  [ 2:0] mem_size_o,  // 新增：操作宽度 (000=byte, 001=half, 010=word, 100=byte_u, 101=half_u)
+    output reg [2:0] mem_size_o,
+    output reg [31:0] mem_data_o,
     output reg mem_we_o,  // 写内存使能
     output reg mem_re_o  // 读内存使能
 );
@@ -110,7 +111,7 @@ module id (
       end
       `INST_TYPE_B: begin
         case (funct3)
-          `INST_BNE,`INST_BEQ,`INST_BLT,`INST_BGE,`INST_BLTU,`INST_BGEU: begin
+          `INST_BNE, `INST_BEQ, `INST_BLT, `INST_BGE, `INST_BLTU, `INST_BGEU: begin
             rs1_addr_o = rs1;  // 寄存器1
             rs2_addr_o = rs2;  // 寄存器2
             op1_o      = rs1_data;
@@ -139,15 +140,23 @@ module id (
             reg_wen    = 1'b0;
             mem_we_o   = 1'b1;
             mem_re_o   = 1'b0;
-            if (funct3 == `INST_SW) mem_size_o = `INST_SW;
-            else if (funct3 == `INST_SH) mem_size_o = `INST_SH;
-            else mem_size_o = `INST_SB;
+            if (funct3 == `INST_SW) begin
+              mem_data_o = rs2_data;
+              mem_size_o = `INST_SW;
+            end else if (funct3 == `INST_SH) begin
+              mem_data_o = {16'b0, rs2_data[15:0]};
+              mem_size_o = `INST_SH;
+            end else begin
+              mem_data_o = {24'b0, rs2_data[7:0]};
+              mem_size_o = `INST_SB;
+            end
           end
           default: begin
             rs1_addr_o = 5'b0;
             rs2_addr_o = 5'b0;
             op1_o      = 32'b0;
             op2_o      = 32'b0;
+            mem_data_o = 32'b0;
             rd_addr_o  = 5'b0;
             reg_wen    = 1'b0;
             mem_we_o   = 1'b0;
@@ -182,7 +191,7 @@ module id (
             reg_wen    = 1'b0;
             mem_we_o   = 1'b0;
             mem_re_o   = 1'b0;
-            mem_size_o = 3'b000;
+            mem_size_o = 3'b0;
           end
         endcase
       end
@@ -202,22 +211,22 @@ module id (
         rd_addr_o  = rd;
         reg_wen    = 1'b1;
       end
-	  `INST_JALR:begin
-	    rs1_addr_o = rs1;
+      `INST_JALR: begin
+        rs1_addr_o = rs1;
         rs2_addr_o = 5'b0;
         op1_o      = rs1_data_i;
         op2_o      = {{20{imm[11]}}, imm};
         rd_addr_o  = rd;
         reg_wen    = 1'b1;
-	  end
-	  `INST_AUIPC:begin
-	    rs1_addr_o = 5'b0;
+      end
+      `INST_AUIPC: begin
+        rs1_addr_o = 5'b0;
         rs2_addr_o = 5'b0;
         op1_o      = {inst_i[31:12], 12'b0};
         op2_o      = inst_addr_i;
         rd_addr_o  = rd;
         reg_wen    = 1'b1;
-	  end
+      end
       default: begin
         rs1_addr_o = 5'b0;
         rs2_addr_o = 5'b0;

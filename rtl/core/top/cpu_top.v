@@ -32,6 +32,10 @@ module cpu_top (
   wire [31:0] id_idex_op2;
   wire [ 4:0] id_idex_rd_addr;
   wire        id_idex_rd_wen;
+  wire [ 2:0] id_idex_mem_size;
+  wire [31:0] id_idex_mem_data;
+  wire        id_idex_mem_we;
+  wire        id_idex_mem_re;
 
   // ID/EX to EX
   wire [31:0] idex_ex_inst;
@@ -40,6 +44,10 @@ module cpu_top (
   wire [31:0] idex_ex_op2;
   wire [ 4:0] idex_ex_rd_addr;
   wire        idex_ex_rd_wen;
+  wire [ 2:0] idex_ex_mem_size;
+  wire [31:0] idex_ex_mem_data;
+  wire        idex_ex_mem_we;
+  wire        idex_ex_mem_re;
 
   // EX to EX/MEM
   wire [ 4:0] ex_exmem_rd_addr;
@@ -49,6 +57,7 @@ module cpu_top (
   wire [31:0] ex_exmem_mem_data;
   wire        ex_exmem_mem_we;
   wire        ex_exmem_mem_re;
+  wire [ 2:0] ex_exmem_mem_size;
 
   // EX to Control
   wire [31:0] ex_ctrl_jump_addr;
@@ -63,6 +72,14 @@ module cpu_top (
   wire [31:0] exmem_mem_mem_data;
   wire        exmem_mem_mem_we;
   wire        exmem_mem_mem_re;
+  wire [ 2:0] exmem_mem_mem_size;
+
+  // MEM to RAM
+  wire [31:0] mem_ram_addr;
+  wire [31:0] mem_ram_data;
+  wire        mem_ram_we;
+  wire        mem_ram_re;
+  wire [ 2:0] mem_ram_size;
 
   // MEM to MEM/WB
   wire [ 4:0] mem_memwb_rd_addr;
@@ -131,12 +148,16 @@ module cpu_top (
       .op2_o      (id_idex_op2),
       .rd_addr_o  (id_idex_rd_addr),
       .reg_wen    (id_idex_rd_wen),
-      .ex_rd_data (ex_exmem_rd_data),   // 从 EX 模块获取
+      .ex_rd_data (ex_exmem_rd_data),
       .ex_rd_addr (ex_exmem_rd_addr),
       .ex_reg_wen (ex_exmem_rd_wen),
-      .mem_rd_data(mem_memwb_rd_data),  // 从 MEM 模块获取
+      .mem_rd_data(mem_memwb_rd_data),
       .mem_rd_addr(mem_memwb_rd_addr),
-      .mem_reg_wen(mem_memwb_rd_wen)
+      .mem_reg_wen(mem_memwb_rd_wen),
+      .mem_size_o (id_idex_mem_size),
+      .mem_data_o (id_idex_mem_data),
+      .mem_we_o   (id_idex_mem_we),
+      .mem_re_o   (id_idex_mem_re)
   );
 
   // ID/EX Pipeline Register
@@ -149,13 +170,21 @@ module cpu_top (
       .op2_i      (id_idex_op2),
       .rd_addr_i  (id_idex_rd_addr),
       .reg_wen_i  (id_idex_rd_wen),
+      .mem_size_i (id_idex_mem_size),
+      .mem_data_i (id_idex_mem_data),
+      .mem_we_i   (id_idex_mem_we),
+      .mem_re_i   (id_idex_mem_re),
       .hold_flag_i(ctrl_hold_flag),
       .inst_o     (idex_ex_inst),
       .inst_addr_o(idex_ex_inst_addr),
       .op1_o      (idex_ex_op1),
       .op2_o      (idex_ex_op2),
       .rd_addr_o  (idex_ex_rd_addr),
-      .reg_wen_o  (idex_ex_rd_wen)
+      .reg_wen_o  (idex_ex_rd_wen),
+      .mem_size_o (idex_ex_mem_size),
+      .mem_data_o (idex_ex_mem_data),
+      .mem_we_o   (idex_ex_mem_we),
+      .mem_re_o   (idex_ex_mem_re)
   );
 
   // Execute (EX)
@@ -166,11 +195,16 @@ module cpu_top (
       .op2_i      (idex_ex_op2),
       .rd_addr_i  (idex_ex_rd_addr),
       .rd_wen_i   (idex_ex_rd_wen),
+      .mem_data_i (idex_ex_mem_data),
+      .mem_size_i (idex_ex_mem_size),
+      .mem_we_i   (idex_ex_mem_we),
+      .mem_re_i   (idex_ex_mem_re),
       .rd_addr_o  (ex_exmem_rd_addr),
       .rd_data_o  (ex_exmem_rd_data),
       .rd_wen_o   (ex_exmem_rd_wen),
       .mem_addr_o (ex_exmem_mem_addr),
       .mem_data_o (ex_exmem_mem_data),
+      .mem_size_o (ex_exmem_mem_size),
       .mem_we_o   (ex_exmem_mem_we),
       .mem_re_o   (ex_exmem_mem_re),
       .jump_addr_o(ex_ctrl_jump_addr),
@@ -189,13 +223,15 @@ module cpu_top (
       .mem_data_i(ex_exmem_mem_data),
       .mem_we_i  (ex_exmem_mem_we),
       .mem_re_i  (ex_exmem_mem_re),
+      .mem_size_i(ex_exmem_mem_size),
       .rd_addr_o (exmem_mem_rd_addr),
       .rd_data_o (exmem_mem_rd_data),
       .rd_wen_o  (exmem_mem_rd_wen),
       .mem_addr_o(exmem_mem_mem_addr),
       .mem_data_o(exmem_mem_mem_data),
       .mem_we_o  (exmem_mem_mem_we),
-      .mem_re_o  (exmem_mem_mem_re)
+      .mem_re_o  (exmem_mem_mem_re),
+      .mem_size_o(exmem_mem_mem_size)
   );
 
   // Memory (MEM)
@@ -207,12 +243,15 @@ module cpu_top (
       .mem_data_i(exmem_mem_mem_data),
       .mem_we_i  (exmem_mem_mem_we),
       .mem_re_i  (exmem_mem_mem_re),
-      .mem_addr_o(),                    // 未使用，可连接到 RAM
-      .mem_data_o(),                    // 未使用，可连接到 RAM
-      .mem_we_o  (),                    // 未使用，可连接到 RAM
-      .mem_re_o  (),                    // 未使用，可连接到 RAM
+      .mem_size_i(exmem_mem_mem_size),
+      .ram_data_i(ram_mem_data),
+      .mem_addr_o(mem_ram_addr),
+      .mem_data_o(mem_ram_data),
+      .mem_we_o  (mem_ram_we),
+      .mem_re_o  (mem_ram_re),
+      .mem_size_o(mem_ram_size),
       .rd_addr_o (mem_memwb_rd_addr),
-      .rd_data_o (mem_memwb_rd_data),   // 输出到 MEM/WB 和 ID
+      .rd_data_o (mem_memwb_rd_data),
       .rd_wen_o  (mem_memwb_rd_wen)
   );
 
@@ -242,7 +281,7 @@ module cpu_top (
   control u_control (
       .jump_addr_i   (ex_ctrl_jump_addr),
       .jump_en_i     (ex_ctrl_jump_en),
-      .hold_flag_ex_i(ex_ctrl_jump_flag),
+      .hold_flag_ex_i(ex_ctrl_hold_flag),
       .jump_addr_o   (ctrl_pc_jump_addr),
       .jump_en_o     (ctrl_pc_jump_en),
       .hold_flag_o   (ctrl_hold_flag)
@@ -251,11 +290,12 @@ module cpu_top (
   // RAM (Memory)
   ram u_ram (
       .clk       (clk),
-      .mem_addr_i(exmem_mem_mem_addr),  // 来自 EX/MEM 的内存地址
-      .mem_data_i(exmem_mem_mem_data),  // 来自 EX/MEM 的写入数据
-      .mem_we_i  (exmem_mem_mem_we),    // 来自 EX/MEM 的写使能
-      .mem_re_i  (exmem_mem_mem_re),    // 来自 EX/MEM 的读使能
-      .mem_data_o(ram_mem_data)         // 输出到 MEM 模块
+      .mem_addr_i(mem_ram_addr),
+      .mem_data_i(mem_ram_data),
+      .mem_we_i  (mem_ram_we),
+      .mem_re_i  (mem_ram_re),
+      .mem_size_i(mem_ram_size),
+      .mem_data_o(ram_mem_data)
   );
 
   // Register File

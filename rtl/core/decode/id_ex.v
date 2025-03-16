@@ -9,10 +9,7 @@ module id_ex (
     input  wire [31:0] op2_i,
     input  wire [ 4:0] rd_addr_i,
     input  wire        reg_wen_i,
-    input  wire [31:0] base_addr_i,
-    input  wire [31:0] addr_offset_i,
-    input  wire        mem_rd_req_i,
-    input  wire [31:0] mem_rd_addr_i,
+    input  wire [31:0] mem_data_i,
     input  wire [ 2:0] mem_size_i,
     input  wire        mem_we_i,
     input  wire        mem_re_i,
@@ -25,6 +22,7 @@ module id_ex (
     output wire [31:0] op2_o,
     output wire [ 4:0] rd_addr_o,
     output wire        reg_wen_o,
+    output wire [31:0] mem_data_o,
     output wire [ 2:0] mem_size_o,
     output wire        mem_we_o,
     output wire        mem_re_o
@@ -77,15 +75,7 @@ module id_ex (
       reg_wen_i,
       reg_wen_o
   );
-  dff_set_hold #(3) dff7 (
-      clk,
-      rst,
-      hold_flag_i,
-      3'b0,
-      mem_size_i,
-      mem_size_o
-  );
-  dff_set_hold #(1) dff8 (
+  dff_set_hold #(1) dff7 (
       clk,
       rst,
       hold_flag_i,
@@ -93,7 +83,7 @@ module id_ex (
       mem_we_i,
       mem_we_o
   );
-  dff_set_hold #(1) dff9 (
+  dff_set_hold #(1) dff8 (
       clk,
       rst,
       hold_flag_i,
@@ -101,5 +91,20 @@ module id_ex (
       mem_re_i,
       mem_re_o
   );
-
+  dff_set_hold #(32) dff9 (
+      clk,
+      rst,
+      hold_flag_i,
+      32'b0,
+      mem_data_i,
+      mem_data_o
+  );
+  dff_set_hold #(3) dff10 (
+      clk,
+      rst,
+      hold_flag_i,
+      3'b0,
+      mem_size_i,
+      mem_size_o
+  );
 endmodule
