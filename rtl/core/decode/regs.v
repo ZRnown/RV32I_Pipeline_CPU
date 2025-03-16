@@ -8,7 +8,7 @@ module regs (
     // to id
     output reg [31:0] reg1_data_o,
     output reg [31:0] reg2_data_o,
-    // from ex
+    // from wb
     input wire [4:0] reg_waddr_i,
     input wire [31:0] reg_wdata_i,
     input reg_wen

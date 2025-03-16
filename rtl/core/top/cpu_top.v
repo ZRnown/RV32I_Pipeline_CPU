@@ -84,6 +84,9 @@ module cpu_top (
   wire        ctrl_pc_jump_en;
   wire        ctrl_hold_flag;
 
+  // RAM to MEM
+  wire [31:0] ram_mem_data;
+
   // 模块实例化
   // Program Counter (PC)
   pc_reg u_pc_reg (
@@ -127,7 +130,13 @@ module cpu_top (
       .op1_o      (id_idex_op1),
       .op2_o      (id_idex_op2),
       .rd_addr_o  (id_idex_rd_addr),
-      .reg_wen    (id_idex_rd_wen)
+      .reg_wen    (id_idex_rd_wen),
+      .ex_rd_data (ex_exmem_rd_data),   // 从 EX 模块获取
+      .ex_rd_addr (ex_exmem_rd_addr),
+      .ex_reg_wen (ex_exmem_rd_wen),
+      .mem_rd_data(mem_memwb_rd_data),  // 从 MEM 模块获取
+      .mem_rd_addr(mem_memwb_rd_addr),
+      .mem_reg_wen(mem_memwb_rd_wen)
   );
 
   // ID/EX Pipeline Register
@@ -198,12 +207,12 @@ module cpu_top (
       .mem_data_i(exmem_mem_mem_data),
       .mem_we_i  (exmem_mem_mem_we),
       .mem_re_i  (exmem_mem_mem_re),
-      .mem_addr_o(),                    // 未使用，可连接到RAM但这里留空
-      .mem_data_o(),                    // 未使用，可连接到RAM但这里留空
-      .mem_we_o  (),                    // 未使用，可连接到RAM但这里留空
-      .mem_re_o  (),                    // 未使用，可连接到RAM但这里留空
+      .mem_addr_o(),                    // 未使用，可连接到 RAM
+      .mem_data_o(),                    // 未使用，可连接到 RAM
+      .mem_we_o  (),                    // 未使用，可连接到 RAM
+      .mem_re_o  (),                    // 未使用，可连接到 RAM
       .rd_addr_o (mem_memwb_rd_addr),
-      .rd_data_o (mem_memwb_rd_data),   // 由RAM提供数据
+      .rd_data_o (mem_memwb_rd_data),   // 输出到 MEM/WB 和 ID
       .rd_wen_o  (mem_memwb_rd_wen)
   );
 
@@ -233,20 +242,20 @@ module cpu_top (
   control u_control (
       .jump_addr_i   (ex_ctrl_jump_addr),
       .jump_en_i     (ex_ctrl_jump_en),
-      .hold_flag_ex_i(ex_ctrl_hold_flag),
+      .hold_flag_ex_i(ex_ctrl_jump_flag),
       .jump_addr_o   (ctrl_pc_jump_addr),
       .jump_en_o     (ctrl_pc_jump_en),
       .hold_flag_o   (ctrl_hold_flag)
   );
 
-  // RAM (Memory) - 补全实例化
+  // RAM (Memory)
   ram u_ram (
       .clk       (clk),
-      .mem_addr_i(exmem_mem_mem_addr),  // 来自EX/MEM的内存地址
-      .mem_data_i(exmem_mem_mem_data),  // 来自EX/MEM的写入数据
-      .mem_we_i  (exmem_mem_mem_we),    // 来自EX/MEM的写使能
-      .mem_re_i  (exmem_mem_mem_re),    // 来自EX/MEM的读使能
-      .mem_data_o(mem_memwb_rd_data)    // 输出到MEM/WB的读取数据
+      .mem_addr_i(exmem_mem_mem_addr),  // 来自 EX/MEM 的内存地址
+      .mem_data_i(exmem_mem_mem_data),  // 来自 EX/MEM 的写入数据
+      .mem_we_i  (exmem_mem_mem_we),    // 来自 EX/MEM 的写使能
+      .mem_re_i  (exmem_mem_mem_re),    // 来自 EX/MEM 的读使能
+      .mem_data_o(ram_mem_data)         // 输出到 MEM 模块
   );
 
   // Register File

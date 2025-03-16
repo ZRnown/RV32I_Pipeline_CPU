@@ -40,17 +40,16 @@ n@_opt2
 R4
 R0
 T_opt3
-!s110 1742050241
-VGNV5BSgGO8L>OPQ0PhWE@0
+!s110 1742115778
+Vg9YaoY13VYV`G]2<V>M_f1
 R1
-=9-f4a80dc7cd80-67d593c1-2bc-385c
+=10-f4a80dc7cd80-67d693c2-1c6-67d8
 o-quiet -auto_acc_if_foreign -work work +acc
 R3
 n@_opt3
 R4
-R0
 vcontrol
-Z5 !s110 1742050417
+Z5 !s110 1742115775
 !i10b 1
 !s100 LVhJ4Pm1N92@aMTd9<><[1
 Z6 !s11b Dg1SIo80bB@j0V0VzS_@n1
@@ -59,14 +58,14 @@ Z7 dE:/Files/Electron/FPGA/RV32I_Pipeline_CPU/sim/simFiles
 w1741790029
 8E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/common/control.v
 FE:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/common/control.v
-!i122 387
+!i122 627
 L0 1 17
 Z8 VDg1SIo80bB@j0V0VzS_@n1
 Z9 OL;L;2020.4;71
 r1
 !s85 0
 31
-Z10 !s108 1742050417.000000
+Z10 !s108 1742115775.000000
 !s107 E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/common/control.v|
 !s90 -reportprogress|300|-work|work|-vopt|-stats=none|E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/common/control.v|
 !i113 0
@@ -75,15 +74,15 @@ R3
 vcpu_top
 R5
 !i10b 1
-!s100 1?alK>]McH;EDDNoMlG333
+!s100 PVINk0H=^gdVH54?Knf9G2
 R6
-IJDzZ8@:8K?2bCQBOGgi>M2
+IW6UgEMd>N^:Uo;@VlTQdT3
 R7
-w1742050225
+w1742115666
 8E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/top/cpu_top.v
 FE:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/top/cpu_top.v
-!i122 398
-L0 1 265
+!i122 638
+L0 1 274
 R8
 R9
 r1
@@ -105,7 +104,7 @@ R7
 w1742048396
 8E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/cpu_top_soc.v
 FE:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/cpu_top_soc.v
-!i122 396
+!i122 636
 L0 1 21
 R8
 R9
@@ -125,10 +124,10 @@ R5
 R6
 IGfo::6?I=K`>ORh6MQLbT3
 R7
-w1742047409
+w1742115700
 8E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/utils/dff_set.v
 FE:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/utils/dff_set.v
-!i122 395
+!i122 635
 Z12 L0 2 14
 R8
 R9
@@ -142,7 +141,7 @@ R10
 R11
 R3
 vdff_set_hold
-Z13 !s110 1742050418
+Z13 !s110 1742115776
 !i10b 1
 !s100 VK3WGP;mW^62V=ZfKB8AH1
 R6
@@ -151,21 +150,21 @@ R7
 w1742047449
 8E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/utils/dff_set_hold.v
 FE:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/utils/dff_set_hold.v
-!i122 405
+!i122 645
 Z14 L0 2 15
 R8
 R9
 r1
 !s85 0
 31
-Z15 !s108 1742050418.000000
+Z15 !s108 1742115776.000000
 !s107 E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/utils/dff_set_hold.v|
 !s90 -reportprogress|300|-work|work|-vopt|-stats=none|E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/utils/dff_set_hold.v|
 !i113 0
 R11
 R3
 vdual_ram
-R13
+R5
 !i10b 1
 !s100 =0odeHTID@6dKU=D3gVKj3
 R6
@@ -174,7 +173,7 @@ R7
 Z16 w1742026153
 Z17 8E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/sim/simFiles/dual_ram.v
 Z18 FE:/Files/Electron/FPGA/RV32I_Pipeline_CPU/sim/simFiles/dual_ram.v
-!i122 400
+!i122 640
 L0 1 42
 R8
 R9
@@ -188,7 +187,7 @@ Z20 !s90 -reportprogress|300|-work|work|-vopt|-stats=none|E:/Files/Electron/FPGA
 R11
 R3
 vdual_ram_template
-R13
+R5
 !i10b 1
 !s100 Q:accbB@TPimTj3NcERlm2
 R6
@@ -197,7 +196,7 @@ R7
 R16
 R17
 R18
-!i122 400
+!i122 640
 L0 44 23
 R8
 R9
@@ -220,7 +219,7 @@ R7
 w1742048202
 8E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/execute/ex.v
 FE:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/execute/ex.v
-!i122 391
+!i122 631
 L0 3 213
 R8
 R9
@@ -240,10 +239,10 @@ R13
 R6
 Iz6dO1RP1D@IZ7X:bIgA7F1
 R7
-w1742048600
+w1742115702
 8E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/execute/ex_mem.v
 FE:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/execute/ex_mem.v
-!i122 406
+!i122 646
 L0 1 70
 R8
 R9
@@ -259,15 +258,15 @@ R3
 vid
 R5
 !i10b 1
-!s100 b1WdmUgVm`zdN2NiiO33;3
+!s100 KH0JD[^z=P;=Tho?XA`@z2
 R6
-I2@MU20fO^UCAZWH0;75S]1
+ISRbh`Tcl_5S@WDW>8Hnlf1
 R7
-w1742046454
+w1742115460
 8E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id.v
 FE:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id.v
-!i122 388
-L0 3 127
+!i122 628
+L0 3 148
 R8
 R9
 r1
@@ -289,7 +288,7 @@ R7
 w1742047392
 8E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id_ex.v
 FE:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id_ex.v
-!i122 389
+!i122 629
 L0 2 70
 R8
 R9
@@ -312,7 +311,7 @@ R7
 w1742046440
 8E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/if.v
 FE:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/if.v
-!i122 392
+!i122 632
 R14
 R8
 R9
@@ -336,7 +335,7 @@ R7
 w1742047362
 8E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/if_id.v
 FE:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/if_id.v
-!i122 393
+!i122 633
 L0 4 30
 R8
 R9
@@ -373,7 +372,7 @@ Z25 !s90 -reportprogress|300|-work|work|-vopt|-stats=none|E:/Files/Electron/FPGA
 R11
 R3
 vmem
-R13
+R5
 !i10b 1
 !s100 CQJEh[jY2z;e6HhN`bSXG2
 R6
@@ -382,37 +381,37 @@ R7
 w1742050350
 8E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/memory/mem.v
 FE:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/memory/mem.v
-!i122 401
+!i122 641
 L0 2 27
 R8
 R9
 r1
 !s85 0
 31
-R15
+R10
 !s107 E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/memory/mem.v|
 !s90 -reportprogress|300|-work|work|-vopt|-stats=none|E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/memory/mem.v|
 !i113 0
 R11
 R3
 vmem_wb
-R13
+R5
 !i10b 1
 !s100 Mk76zY02]2fL]dW<8Q8]93
 R6
 I=K6?j_3@d9EZiKR]`gS5V0
 R7
-w1742049513
+w1742115701
 8E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/memory/mem_wb.v
 FE:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/memory/mem_wb.v
-!i122 402
+!i122 642
 L0 1 34
 R8
 R9
 r1
 !s85 0
 31
-R15
+R10
 !s107 E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/memory/mem_wb.v|
 !s90 -reportprogress|300|-work|work|-vopt|-stats=none|E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/memory/mem_wb.v|
 !i113 0
@@ -428,7 +427,7 @@ R7
 w1741868618
 8E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/pc_reg.v
 FE:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/pc_reg.v
-!i122 394
+!i122 634
 R12
 R8
 R9
@@ -442,7 +441,7 @@ R10
 R11
 R3
 vram
-R13
+R5
 !i10b 1
 !s100 ZkQG@E7]U=KdbMjOa@<ai2
 R6
@@ -451,14 +450,14 @@ R7
 w1742049965
 Z26 8E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/perips/RAM.v
 Z27 FE:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/perips/RAM.v
-!i122 404
+!i122 644
 L0 1 9
 R8
 R9
 r1
 !s85 0
 31
-R15
+R10
 Z28 !s107 E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/perips/RAM.v|
 Z29 !s90 -reportprogress|300|-work|work|-vopt|-stats=none|E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/perips/RAM.v|
 !i113 0
@@ -495,10 +494,10 @@ R5
 R6
 I9dVn?Q>SHa4[b2LgPb1VC0
 R7
-w1741774470
+w1742111276
 8E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/regs.v
 FE:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/regs.v
-!i122 390
+!i122 630
 L0 2 36
 R8
 R9
@@ -521,7 +520,7 @@ R7
 w1742048387
 R21
 R22
-!i122 399
+!i122 639
 R23
 R8
 R9
@@ -537,15 +536,15 @@ R3
 vtb
 R5
 !i10b 1
-!s100 7WhZ^3?^C<OM>2][cZiV<0
+!s100 Za8RmBTeR5ZYRi=_O_21d3
 R6
-I0C[FQf]7MdX]h;HI3;4z:3
+IioSj_Fk;`3?dcG:V5@6??1
 R7
-w1742048879
+w1742115771
 8E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/sim/testcases/cpu_top_tb.v
 FE:/Files/Electron/FPGA/RV32I_Pipeline_CPU/sim/testcases/cpu_top_tb.v
-!i122 397
-L0 1 30
+!i122 637
+L0 1 51
 R8
 R9
 r1
@@ -558,23 +557,23 @@ R10
 R11
 R3
 vwb
-R13
+R5
 !i10b 1
-!s100 KQ;7IOBol5K7W3koXIXij1
+!s100 T^k[1[TGjZoG4ZY:XmIG61
 R6
-I318KOAbd6V_:Vk2VkVPke1
+IjQoQ`6@05P1HId_=CHiWB3
 R7
-w1742046605
+w1742110340
 8E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/writeback/wb.v
 FE:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/writeback/wb.v
-!i122 403
-L0 2 11
+!i122 643
+R12
 R8
 R9
 r1
 !s85 0
 31
-R15
+R10
 !s107 E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/writeback/wb.v|
 !s90 -reportprogress|300|-work|work|-vopt|-stats=none|E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/writeback/wb.v|
 !i113 0
