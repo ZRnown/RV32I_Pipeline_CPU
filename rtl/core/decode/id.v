@@ -103,7 +103,7 @@ module id (
       end
       `INST_TYPE_B: begin
         case (funct3)
-          `INST_BNE, `INST_BEQ: begin
+          `INST_BNE,`INST_BEQ,`INST_BLT,`INST_BGE,`INST_BLTU,`INST_BGEU: begin
             rs1_addr_o = rs1;  // 寄存器1
             rs2_addr_o = rs2;  // 寄存器2
             op1_o      = rs1_data;
@@ -137,6 +137,22 @@ module id (
         rd_addr_o  = rd;
         reg_wen    = 1'b1;
       end
+	  `INST_JALR:begin
+	    rs1_addr_o = rs1;
+        rs2_addr_o = 5'b0;
+        op1_o      = rs1_data_i;
+        op2_o      = {{20{imm[11]}}, imm};
+        rd_addr_o  = rd;
+        reg_wen    = 1'b1;
+	  end
+	  `INST_AUIPC:begin
+	    rs1_addr_o = 5'b0;
+        rs2_addr_o = 5'b0;
+        op1_o      = {inst_i[31:12], 12'b0};
+        op2_o      = inst_addr_i;
+        rd_addr_o  = rd;
+        reg_wen    = 1'b1;
+	  end
       default: begin
         rs1_addr_o = 5'b0;
         rs2_addr_o = 5'b0;
