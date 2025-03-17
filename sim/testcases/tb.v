@@ -15,7 +15,7 @@ module tb;
   end
   initial begin
     $readmemh(
-        "E:\\shiyanshi\\project\\DevADemo\\RV32I_Pipeline_CPU\\sim\\testcases\\inst_test\\rv32ui-p-jalr.txt",
+        "E:\\Files\\Electron\\FPGA\\RV32I_Pipeline_CPU\\sim\\testcases\\generated\\inst_data.txt",
         tb.u_cpu_top_soc.u_rom.ROM);
   end
   initial begin
@@ -43,6 +43,7 @@ module tb;
         $display("x%2d register value is %d", r, tb.u_cpu_top_soc.u_cpu_top.u_regs.regs[r]);
       end
     end
+    $finish();
   end
   cpu_top_soc u_cpu_top_soc (
       .clk(clk),

@@ -8,14 +8,19 @@ module ex (
     input  wire [31:0] op2_i,
     input  wire [ 4:0] rd_addr_i,
     input  wire        rd_wen_i,
+    input  wire [31:0] mem_data_i,
+    input  wire [ 2:0] mem_size_i,
+    input  wire        mem_we_i,
+    input  wire        mem_re_i,
     // to ex_mem
     output reg  [ 4:0] rd_addr_o,
     output reg  [31:0] rd_data_o,
     output reg         rd_wen_o,
     output reg  [31:0] mem_addr_o,   // 访存地址（如 LW/SW 的地址）
     output reg  [31:0] mem_data_o,   // 写入内存的数据（SW 指令）
-    output reg         mem_we_o,     // 内存写使能（1: Store, 0: Load 或其他）
-    output reg         mem_re_o,     // 内存读使能（1: Load）
+    output reg  [ 2:0] mem_size_o,
+    output reg         mem_we_o,
+    output reg         mem_re_o,
     // to control
     output reg  [31:0] jump_addr_o,
     output reg         jump_en_o,
@@ -41,6 +46,17 @@ module ex (
   wire [31:0] SRA_mask = (32'hffff_ffff) >> op2_i[4:0];
 
   always @(*) begin
+    rd_data_o   = 32'b0;
+    rd_addr_o   = 5'b0;
+    rd_wen_o    = 1'b0;
+    mem_addr_o  = 32'b0;
+    mem_data_o  = 32'b0;
+    mem_we_o    = 1'b0;
+    mem_re_o    = 1'b0;
+    mem_size_o  = 3'b0;
+    jump_addr_o = 32'b0;
+    jump_en_o   = 1'b0;
+    hold_flag_o = 1'b0;
     case (opcode)
       `INST_TYPE_I: begin
         jump_addr_o = 32'b0;
@@ -179,22 +195,22 @@ module ex (
             jump_en_o   = ~op1_i_equal_op2_i;
             hold_flag_o = 1'b0;
           end
-		  `INST_BLT: begin
+          `INST_BLT: begin
             jump_addr_o = (inst_addr_i + jump_imm) & {32{(op1_i_less_op2_i_signed)}};
             jump_en_o   = op1_i_less_op2_i_signed;
             hold_flag_o = 1'b0;
           end
-		  `INST_BGE: begin
+          `INST_BGE: begin
             jump_addr_o = (inst_addr_i + jump_imm) & {32{(~op1_i_less_op2_i_signed)}};
             jump_en_o   = ~op1_i_less_op2_i_signed;
             hold_flag_o = 1'b0;
           end
-		  `INST_BLTU: begin
+          `INST_BLTU: begin
             jump_addr_o = (inst_addr_i + jump_imm) & {32{(op1_i_less_op2_i_unsigned)}};
             jump_en_o   = op1_i_less_op2_i_unsigned;
             hold_flag_o = 1'b0;
           end
-		  `INST_BGEU: begin
+          `INST_BGEU: begin
             jump_addr_o = (inst_addr_i + jump_imm) & {32{(~op1_i_less_op2_i_unsigned)}};
             jump_en_o   = ~op1_i_less_op2_i_unsigned;
             hold_flag_o = 1'b0;
@@ -206,15 +222,57 @@ module ex (
           end
         endcase
       end
+      `INST_TYPE_S: begin
+        case (funct3)
+          `INST_SB, `INST_SH, `INST_SW: begin
+            mem_we_o   = mem_we_i;
+            mem_re_o   = mem_re_i;
+            mem_addr_o = op1_i + op2_i;
+            mem_data_o = mem_data_i;
+            mem_size_o = mem_size_i;
+          end
+          default: begin
+            mem_we_o   = 1'b0;
+            mem_re_o   = 1'b0;
+            mem_addr_o = 32'b0;
+            mem_data_o = 32'b0;
+            mem_size_o = 3'b0;
+          end
+        endcase
+      end
+      `INST_TYPE_L: begin
+        case (funct3)
+          `INST_LB, `INST_LH, `INST_LW: begin
+            mem_we_o   = mem_we_i;
+            mem_re_o   = mem_re_i;
+            mem_addr_o = op1_i + op2_i;
+            mem_data_o = 32'b0;
+            mem_size_o = mem_size_i;
+            rd_addr_o  = rd_addr_i;
+            rd_wen_o   = rd_wen_i;
+            rd_data_o  = 32'b0;
+          end
+          default: begin
+            mem_we_o   = 1'b0;
+            mem_re_o   = 1'b0;
+            mem_addr_o = 32'b0;
+            mem_data_o = 32'b0;
+            mem_size_o = 3'b0;
+            rd_addr_o  = 5'b0;
+            rd_wen_o   = 1'b0;
+            rd_data_o  = 32'b0;
+          end
+        endcase
+      end
       `INST_JAL: begin
         rd_data_o = inst_addr_i + 32'h4;
         rd_addr_o = rd_addr_i;
         rd_wen_o = 1'b1;
-		jump_addr_o = op1_i + inst_addr_i;
+        jump_addr_o = op1_i + inst_addr_i;
         jump_en_o = 1'b1;
         hold_flag_o = 1'b0;
       end
-	  `INST_JALR: begin
+      `INST_JALR: begin
         rd_data_o = inst_addr_i + 32'h4;
         rd_addr_o = rd_addr_i;
         rd_wen_o = 1'b1;
@@ -230,14 +288,14 @@ module ex (
         jump_en_o = 1'b0;
         hold_flag_o = 1'b0;
       end
-	  `INST_AUIPC:begin
-	    rd_data_o = op1_i + op2_i;
+      `INST_AUIPC: begin
+        rd_data_o = op1_i + op2_i;
         rd_addr_o = rd_addr_i;
         rd_wen_o = 1'b1;
         jump_addr_o = 32'b0;
         jump_en_o = 1'b0;
         hold_flag_o = 1'b0;
-	  end
+      end
       default: begin
         rd_data_o = 32'b0;
         rd_addr_o = 5'b0;

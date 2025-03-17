@@ -1,4 +1,11 @@
-E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/regs.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/regs.v
+E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id_ex.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id_ex.v
+Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
+-- Compiling module id_ex
+
+Top level modules:
+	id_ex
+
+} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/regs.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/regs.v
 Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
 -- Compiling module regs
 
@@ -18,13 +25,6 @@ Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
 
 Top level modules:
 	if_id
-
-} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id_ex.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id_ex.v
-Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
--- Compiling module id_ex
-
-Top level modules:
-	id_ex
 
 } {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/execute/ex_mem.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/execute/ex_mem.v
 Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020

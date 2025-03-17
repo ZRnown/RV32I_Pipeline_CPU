@@ -2,40 +2,45 @@
 `include "../common/defines.v"
 module id (
     // from if_id
-    input  wire [31:0] inst_i,
-    input  wire [31:0] inst_addr_i,
+    input wire [31:0] inst_i,
+    input wire [31:0] inst_addr_i,
     // from ex (数据相关性)
-    input  wire [31:0] ex_rd_data,   // EX 阶段的 ALU 计算结果
-    input  wire [ 4:0] ex_rd_addr,   // EX 阶段的目标寄存器地址
-    input  wire        ex_reg_wen,   // EX 阶段的写使能
+    input wire [31:0] ex_rd_data,  // EX 阶段的 ALU 计算结果
+    input wire [4:0] ex_rd_addr,  // EX 阶段的目标寄存器地址
+    input wire ex_reg_wen,  // EX 阶段的写使能
     // from mem (数据相关性)
-    input  wire [31:0] mem_rd_data,  // MEM 阶段的数据（例如加载指令的结果）
-    input  wire [ 4:0] mem_rd_addr,  // MEM 阶段的目标寄存器地址
-    input  wire        mem_reg_wen,  // MEM 阶段的写使能
+    input wire [31:0] mem_rd_data,  // MEM 阶段的数据（例如加载指令的结果）
+    input wire [4:0] mem_rd_addr,  // MEM 阶段的目标寄存器地址
+    input wire mem_reg_wen,  // MEM 阶段的写使能
     // to regs
-    output reg  [ 4:0] rs1_addr_o,
-    output reg  [ 4:0] rs2_addr_o,
+    output reg [4:0] rs1_addr_o,
+    output reg [4:0] rs2_addr_o,
     // from regs
-    input  wire [31:0] rs1_data_i,
-    input  wire [31:0] rs2_data_i,
+    input wire [31:0] rs1_data_i,
+    input wire [31:0] rs2_data_i,
     // to id_ex 
-    output reg  [31:0] inst_o,
-    output reg  [31:0] inst_addr_o,
-    output reg  [31:0] op1_o,
-    output reg  [31:0] op2_o,
-    output reg  [ 4:0] rd_addr_o,
-    output reg         reg_wen
+    output reg [31:0] inst_o,
+    output reg [31:0] inst_addr_o,
+    output reg [31:0] op1_o,
+    output reg [31:0] op2_o,
+    output reg [4:0] rd_addr_o,
+    output reg reg_wen,
+    output reg [2:0] mem_size_o,
+    output reg [31:0] mem_data_o,
+    output reg mem_we_o,  // 写内存使能
+    output reg mem_re_o  // 读内存使能
 );
   // 指令解析
   wire [ 6:0] opcode = inst_i[6:0];
   wire [11:0] imm = inst_i[31:20];
+  wire [11:0] s_imm = {inst_i[31:25], inst_i[11:7]};  // S-type 立即数
   wire [ 4:0] rs1 = inst_i[19:15];
   wire [ 4:0] rs2 = inst_i[24:20];
   wire [ 4:0] rd = inst_i[11:7];
   wire [ 2:0] funct3 = inst_i[14:12];
   wire [ 6:0] funct7 = inst_i[31:25];
   wire [ 4:0] shamt = inst_i[24:20];
-  // 前递逻辑
+  // 前递逻辑(解决数据相关性)
   reg [31:0] rs1_data, rs2_data;
   always @(*) begin
     // rs1 前递
@@ -52,6 +57,9 @@ module id (
     else rs2_data = rs2_data_i;  // 从 regs 读取（包含 WB 旁路）
     inst_o = inst_i;
     inst_addr_o = inst_addr_i;
+    mem_we_o = 1'b0;
+    mem_re_o = 1'b0;
+    mem_size_o = 3'b0;  // 默认字节操作
     case (opcode)
       `INST_TYPE_I: begin
         case (funct3)
@@ -103,7 +111,7 @@ module id (
       end
       `INST_TYPE_B: begin
         case (funct3)
-          `INST_BNE,`INST_BEQ,`INST_BLT,`INST_BGE,`INST_BLTU,`INST_BGEU: begin
+          `INST_BNE, `INST_BEQ, `INST_BLT, `INST_BGE, `INST_BLTU, `INST_BGEU: begin
             rs1_addr_o = rs1;  // 寄存器1
             rs2_addr_o = rs2;  // 寄存器2
             op1_o      = rs1_data;
@@ -118,6 +126,72 @@ module id (
             op2_o      = 32'b0;
             rd_addr_o  = 5'b0;
             reg_wen    = 1'b0;
+          end
+        endcase
+      end
+      `INST_TYPE_S: begin
+        case (funct3)
+          `INST_SW, `INST_SH, `INST_SB: begin
+            rs1_addr_o = rs1;
+            rs2_addr_o = rs2;
+            op1_o      = rs1_data;
+            op2_o      = {{20{s_imm[11]}}, s_imm};
+            rd_addr_o  = 5'b0;
+            reg_wen    = 1'b0;
+            mem_we_o   = 1'b1;
+            mem_re_o   = 1'b0;
+            if (funct3 == `INST_SW) begin
+              mem_data_o = rs2_data;
+              mem_size_o = `INST_SW;
+            end else if (funct3 == `INST_SH) begin
+              mem_data_o = {16'b0, rs2_data[15:0]};
+              mem_size_o = `INST_SH;
+            end else begin
+              mem_data_o = {24'b0, rs2_data[7:0]};
+              mem_size_o = `INST_SB;
+            end
+          end
+          default: begin
+            rs1_addr_o = 5'b0;
+            rs2_addr_o = 5'b0;
+            op1_o      = 32'b0;
+            op2_o      = 32'b0;
+            mem_data_o = 32'b0;
+            rd_addr_o  = 5'b0;
+            reg_wen    = 1'b0;
+            mem_we_o   = 1'b0;
+            mem_re_o   = 1'b0;
+            mem_size_o = 3'b0;
+          end
+        endcase
+      end
+      `INST_TYPE_L: begin
+        case (funct3)
+          `INST_LW, `INST_LH, `INST_LB, `INST_LHU, `INST_LBU: begin
+            rs1_addr_o = rs1;
+            rs2_addr_o = 5'b0;
+            op1_o      = rs1_data;
+            op2_o      = {{20{imm[11]}}, imm};
+            rd_addr_o  = rd;
+            mem_re_o   = 1'b1;
+            mem_we_o   = 1'b0;
+            reg_wen    = 1'b1;
+            if (funct3 == `INST_LW) mem_size_o = `INST_LW;
+            else if (funct3 == `INST_LH) mem_size_o = `INST_LH;
+            else if (funct3 == `INST_LB) mem_size_o = `INST_LB;
+            else if (funct3 == `INST_LHU) mem_size_o = `INST_LHU;
+            else mem_size_o = `INST_LBU;
+          end
+          default: begin
+            rs1_addr_o = 5'b0;
+            rs2_addr_o = 5'b0;
+            op1_o      = 32'b0;
+            op2_o      = 32'b0;
+            rd_addr_o  = 5'b0;
+            reg_wen    = 1'b0;
+            mem_we_o   = 1'b0;
+            mem_re_o   = 1'b0;
+            mem_size_o = 3'b0;
           end
         endcase
       end
@@ -137,22 +211,22 @@ module id (
         rd_addr_o  = rd;
         reg_wen    = 1'b1;
       end
-	  `INST_JALR:begin
-	    rs1_addr_o = rs1;
+      `INST_JALR: begin
+        rs1_addr_o = rs1;
         rs2_addr_o = 5'b0;
         op1_o      = rs1_data_i;
         op2_o      = {{20{imm[11]}}, imm};
         rd_addr_o  = rd;
         reg_wen    = 1'b1;
-	  end
-	  `INST_AUIPC:begin
-	    rs1_addr_o = 5'b0;
+      end
+      `INST_AUIPC: begin
+        rs1_addr_o = 5'b0;
         rs2_addr_o = 5'b0;
         op1_o      = {inst_i[31:12], 12'b0};
         op2_o      = inst_addr_i;
         rd_addr_o  = rd;
         reg_wen    = 1'b1;
-	  end
+      end
       default: begin
         rs1_addr_o = 5'b0;
         rs2_addr_o = 5'b0;
