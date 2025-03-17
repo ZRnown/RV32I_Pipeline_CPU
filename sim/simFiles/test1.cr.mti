@@ -26,6 +26,13 @@ Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
 Top level modules:
 	if_id
 
+} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/execute/ex_mem.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/execute/ex_mem.v
+Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
+-- Compiling module ex_mem
+
+Top level modules:
+	ex_mem
+
 } {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/cpu_top_soc.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/cpu_top_soc.v
 Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
 -- Compiling module cpu_top_soc
@@ -88,13 +95,6 @@ Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
 
 Top level modules:
 	dff_set
-
-} {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/sim/testcases/cpu_top_tb.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/sim/testcases/cpu_top_tb.v
-Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020
--- Compiling module tb
-
-Top level modules:
-	tb
 
 } {} {}} E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/top/cpu_top.v {1 {vlog -work work -vopt -stats=none E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/top/cpu_top.v
 Model Technology ModelSim SE-64 vlog 2020.4 Compiler 2020.10 Oct 13 2020

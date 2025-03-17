@@ -1,8 +1,16 @@
 module cpu_top (
     input  wire        clk,
     input  wire        rst,
+    // ROM
     input  wire [31:0] inst_i,
-    output wire [31:0] inst_addr_o
+    output wire [31:0] inst_addr_o,
+    // RAM
+    output wire [31:0] data_addr_o,  // 数据地址输出到外部 RAM
+    output wire [31:0] data_o,       // 数据输出到外部 RAM（写数据）
+    output wire        data_we_o,    // 数据写使能
+    output wire        data_re_o,    // 数据读使能
+    output wire [ 2:0] data_size_o,  // 数据大小（字节、半字、字）
+    input  wire [31:0] data_i        // 从外部 RAM 输入的数据
 );
 
   // 内部信号声明 - 按流水线阶段分组
@@ -74,7 +82,7 @@ module cpu_top (
   wire        exmem_mem_mem_re;
   wire [ 2:0] exmem_mem_mem_size;
 
-  // MEM to RAM
+  // MEM to External RAM (直接连接到外部接口)
   wire [31:0] mem_ram_addr;
   wire [31:0] mem_ram_data;
   wire        mem_ram_we;
@@ -101,8 +109,16 @@ module cpu_top (
   wire        ctrl_pc_jump_en;
   wire        ctrl_hold_flag;
 
-  // RAM to MEM
+  // External RAM to MEM
   wire [31:0] ram_mem_data;
+
+  // 将 MEM 阶段的输出直接连接到外部 RAM 接口
+  assign data_addr_o  = mem_ram_addr;
+  assign data_o       = mem_ram_data;
+  assign data_we_o    = mem_ram_we;
+  assign data_re_o    = mem_ram_re;
+  assign data_size_o  = mem_ram_size;
+  assign ram_mem_data = data_i;  // 从外部 RAM 输入的数据
 
   // 模块实例化
   // Program Counter (PC)
@@ -244,7 +260,7 @@ module cpu_top (
       .mem_we_i  (exmem_mem_mem_we),
       .mem_re_i  (exmem_mem_mem_re),
       .mem_size_i(exmem_mem_mem_size),
-      .ram_data_i(ram_mem_data),
+      .ram_data_i(ram_mem_data),        // 来自外部 RAM 的数据
       .mem_addr_o(mem_ram_addr),
       .mem_data_o(mem_ram_data),
       .mem_we_o  (mem_ram_we),
@@ -285,17 +301,6 @@ module cpu_top (
       .jump_addr_o   (ctrl_pc_jump_addr),
       .jump_en_o     (ctrl_pc_jump_en),
       .hold_flag_o   (ctrl_hold_flag)
-  );
-
-  // RAM (Memory)
-  ram u_ram (
-      .clk       (clk),
-      .mem_addr_i(mem_ram_addr),
-      .mem_data_i(mem_ram_data),
-      .mem_we_i  (mem_ram_we),
-      .mem_re_i  (mem_ram_re),
-      .mem_size_i(mem_ram_size),
-      .mem_data_o(ram_mem_data)
   );
 
   // Register File
