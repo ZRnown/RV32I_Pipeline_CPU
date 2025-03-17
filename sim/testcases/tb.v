@@ -14,8 +14,9 @@ module tb;
     rst <= 1'b1;
   end
   initial begin
-    $readmemb("E:\\Files\\Electron\\FPGA\\RV32I_Pipeline_CPU\\sim\\testcases\\inst_data_ADD.txt",
-              tb.u_cpu_top_soc.u_rom.ROM);
+    $readmemh(
+        "E:\\Files\\Electron\\FPGA\\RV32I_Pipeline_CPU\\sim\\testcases\\generated\\inst_data.txt",
+        tb.u_cpu_top_soc.u_rom.ROM);
   end
   initial begin
     // while (1) begin
@@ -42,6 +43,7 @@ module tb;
         $display("x%2d register value is %d", r, tb.u_cpu_top_soc.u_cpu_top.u_regs.regs[r]);
       end
     end
+    $finish();
   end
   cpu_top_soc u_cpu_top_soc (
       .clk(clk),
