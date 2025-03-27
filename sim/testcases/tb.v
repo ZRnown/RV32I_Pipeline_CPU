@@ -10,24 +10,20 @@ module tb;
   initial begin
     clk <= 1'b1;
     rst <= 1'b0;
-    #30;
+    #50;
     rst <= 1'b1;
   end
   initial begin
     $readmemh(
-        "E:\\Files\\Electron\\FPGA\\RV32I_Pipeline_CPU\\sim\\testcases\\generated\\inst_data.txt",
+        "E:\\Files\\Electron\\FPGA\\RV32I_Pipeline_CPU\\sim\\testcases\\inst_test\\rv32ui-p-sw.txt",
         tb.u_cpu_top_soc.u_rom.ROM);
   end
+  // initial begin
+  //   // Initialize data memory to match rv32ui-p-lhu
+  //   tb.u_cpu_top_soc.u_ram.memory[32'h400] = 32'hff00_00ff;  // 0x1000: 0x00ff, 0x1002: 0xff00
+  //   tb.u_cpu_top_soc.u_ram.memory[32'h401] = 32'hf00f_0ff0;  // 0x1004: 0x0ff0, 0x1006: 0xf00f
+  // end
   initial begin
-    // while (1) begin
-    //   @(posedge clk)
-    //     $display(
-    //         "x27 register value is %d", tb.cpu_top_soc_inst.cpu_top_inst.regs_inst.regs[27]
-    //     );
-    //   $display("x28 register value is %d", tb.cpu_top_soc_inst.cpu_top_inst.regs_inst.regs[28]);
-    //   $display("x29 register value is %d", tb.cpu_top_soc_inst.cpu_top_inst.regs_inst.regs[29]);
-    //   $display("------------------------");
-    // end
     wait (x26 == 32'b1);
     #200;
     if (x27 == 32'b1) begin

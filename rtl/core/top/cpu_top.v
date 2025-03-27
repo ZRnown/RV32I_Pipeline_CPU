@@ -56,16 +56,18 @@ module cpu_top (
   wire [31:0] idex_ex_mem_data;
   wire        idex_ex_mem_we;
   wire        idex_ex_mem_re;
+  wire [ 4:0] idex_ex_rs1_addr;  // 修正为 5 位
+  wire [ 4:0] idex_ex_rs2_addr;  // 修正为 5 位
 
   // EX to EX/MEM
   wire [ 4:0] ex_exmem_rd_addr;
   wire [31:0] ex_exmem_rd_data;
   wire        ex_exmem_rd_wen;
-  wire [31:0] ex_exmem_mem_addr;
-  wire [31:0] ex_exmem_mem_data;
-  wire        ex_exmem_mem_we;
-  wire        ex_exmem_mem_re;
-  wire [ 2:0] ex_exmem_mem_size;
+  wire [31:0] ex_exmem_mem_addr;  // 连接到外部 RAM
+  wire [31:0] ex_exmem_mem_data;  // 连接到外部 RAM
+  wire        ex_exmem_mem_we;  // 连接到外部 RAM
+  wire        ex_exmem_mem_re;  // 连接到外部 RAM
+  wire [ 2:0] ex_exmem_mem_size;  // 连接到外部 RAM
 
   // EX to Control
   wire [31:0] ex_ctrl_jump_addr;
@@ -76,28 +78,22 @@ module cpu_top (
   wire [ 4:0] exmem_mem_rd_addr;
   wire [31:0] exmem_mem_rd_data;
   wire        exmem_mem_rd_wen;
-  wire [31:0] exmem_mem_mem_addr;
-  wire [31:0] exmem_mem_mem_data;
-  wire        exmem_mem_mem_we;
-  wire        exmem_mem_mem_re;
-  wire [ 2:0] exmem_mem_mem_size;
-
-  // MEM to External RAM (直接连接到外部接口)
-  wire [31:0] mem_ram_addr;
-  wire [31:0] mem_ram_data;
-  wire        mem_ram_we;
-  wire        mem_ram_re;
-  wire [ 2:0] mem_ram_size;
+  wire [31:0] exmem_mem_ram_data;  // 从 RAM 读取的数据
+  wire        exmem_mem_mem_re;  // 传递 mem_re
 
   // MEM to MEM/WB
   wire [ 4:0] mem_memwb_rd_addr;
   wire [31:0] mem_memwb_rd_data;
   wire        mem_memwb_rd_wen;
+  wire [31:0] mem_memwb_ram_data;  // 从 RAM 读取的数据
+  wire        mem_memwb_mem_re;
 
   // MEM/WB to WB
   wire [ 4:0] memwb_wb_rd_addr;
   wire [31:0] memwb_wb_rd_data;
   wire        memwb_wb_rd_wen;
+  wire [31:0] memwb_wb_ram_data;
+  wire        memwb_wb_mem_re;
 
   // WB to Regs
   wire [ 4:0] wb_regs_rd_addr;
@@ -108,17 +104,12 @@ module cpu_top (
   wire [31:0] ctrl_pc_jump_addr;
   wire        ctrl_pc_jump_en;
   wire        ctrl_hold_flag;
-
-  // External RAM to MEM
-  wire [31:0] ram_mem_data;
-
-  // 将 MEM 阶段的输出直接连接到外部 RAM 接口
-  assign data_addr_o  = mem_ram_addr;
-  assign data_o       = mem_ram_data;
-  assign data_we_o    = mem_ram_we;
-  assign data_re_o    = mem_ram_re;
-  assign data_size_o  = mem_ram_size;
-  assign ram_mem_data = data_i;  // 从外部 RAM 输入的数据
+  // EX 阶段直接连接到外部 RAM 接口
+  assign data_addr_o = ex_exmem_mem_addr;
+  assign data_o      = ex_exmem_mem_data;
+  assign data_we_o   = ex_exmem_mem_we;
+  assign data_re_o   = ex_exmem_mem_re;
+  assign data_size_o = ex_exmem_mem_size;
 
   // 模块实例化
   // Program Counter (PC)
@@ -152,28 +143,28 @@ module cpu_top (
 
   // Instruction Decode (ID)
   id u_id (
-      .inst_i     (ifid_id_inst),
-      .inst_addr_i(ifid_id_inst_addr),
-      .rs1_addr_o (id_regs_rs1_addr),
-      .rs2_addr_o (id_regs_rs2_addr),
-      .rs1_data_i (regs_id_rs1_data),
-      .rs2_data_i (regs_id_rs2_data),
-      .inst_o     (id_idex_inst),
-      .inst_addr_o(id_idex_inst_addr),
-      .op1_o      (id_idex_op1),
-      .op2_o      (id_idex_op2),
-      .rd_addr_o  (id_idex_rd_addr),
-      .reg_wen    (id_idex_rd_wen),
-      .ex_rd_data (ex_exmem_rd_data),
-      .ex_rd_addr (ex_exmem_rd_addr),
-      .ex_reg_wen (ex_exmem_rd_wen),
-      .mem_rd_data(mem_memwb_rd_data),
-      .mem_rd_addr(mem_memwb_rd_addr),
-      .mem_reg_wen(mem_memwb_rd_wen),
-      .mem_size_o (id_idex_mem_size),
-      .mem_data_o (id_idex_mem_data),
-      .mem_we_o   (id_idex_mem_we),
-      .mem_re_o   (id_idex_mem_re)
+      .inst_i       (ifid_id_inst),
+      .inst_addr_i  (ifid_id_inst_addr),
+      .rs1_addr_o   (id_regs_rs1_addr),
+      .rs2_addr_o   (id_regs_rs2_addr),
+      .rs1_data_i   (regs_id_rs1_data),
+      .rs2_data_i   (regs_id_rs2_data),
+      .inst_o       (id_idex_inst),
+      .inst_addr_o  (id_idex_inst_addr),
+      .op1_o        (id_idex_op1),
+      .op2_o        (id_idex_op2),
+      .rd_addr_o    (id_idex_rd_addr),
+      .reg_wen      (id_idex_rd_wen),
+      .mem_size_o   (id_idex_mem_size),
+      .mem_data_o   (id_idex_mem_data),
+      .mem_we_o     (id_idex_mem_we),
+      .mem_re_o     (id_idex_mem_re),
+      .ex_rd_addr_i (ex_exmem_rd_addr),   // 从 EX 阶段获取目标寄存器地址
+      .ex_result_i  (ex_exmem_rd_data),   // 从 EX 阶段获取计算结果
+      .ex_reg_wen_i (ex_exmem_rd_wen),    // 从 EX 阶段获取写使能信号
+      .mem_rd_addr_i(mem_memwb_rd_addr),
+      .mem_result_i (mem_memwb_rd_data),
+      .mem_reg_wen_i(mem_memwb_rd_wen)
   );
 
   // ID/EX Pipeline Register
@@ -200,97 +191,103 @@ module cpu_top (
       .mem_size_o (idex_ex_mem_size),
       .mem_data_o (idex_ex_mem_data),
       .mem_we_o   (idex_ex_mem_we),
-      .mem_re_o   (idex_ex_mem_re)
+      .mem_re_o   (idex_ex_mem_re),
+      .rs1_addr_i (id_regs_rs1_addr),
+      .rs1_addr_o (idex_ex_rs1_addr),   // 修正为 5 位信号
+      .rs2_addr_i (id_regs_rs2_addr),
+      .rs2_addr_o (idex_ex_rs2_addr)    // 修正为 5 位信号
   );
 
-  // Execute (EX)
+  // Execute (EX) - 直接访问 RAM
   ex u_ex (
-      .inst_i     (idex_ex_inst),
-      .inst_addr_i(idex_ex_inst_addr),
-      .op1_i      (idex_ex_op1),
-      .op2_i      (idex_ex_op2),
-      .rd_addr_i  (idex_ex_rd_addr),
-      .rd_wen_i   (idex_ex_rd_wen),
-      .mem_data_i (idex_ex_mem_data),
-      .mem_size_i (idex_ex_mem_size),
-      .mem_we_i   (idex_ex_mem_we),
-      .mem_re_i   (idex_ex_mem_re),
-      .rd_addr_o  (ex_exmem_rd_addr),
-      .rd_data_o  (ex_exmem_rd_data),
-      .rd_wen_o   (ex_exmem_rd_wen),
-      .mem_addr_o (ex_exmem_mem_addr),
-      .mem_data_o (ex_exmem_mem_data),
-      .mem_size_o (ex_exmem_mem_size),
-      .mem_we_o   (ex_exmem_mem_we),
-      .mem_re_o   (ex_exmem_mem_re),
-      .jump_addr_o(ex_ctrl_jump_addr),
-      .jump_en_o  (ex_ctrl_jump_en),
-      .hold_flag_o(ex_ctrl_hold_flag)
+      .inst_i      (idex_ex_inst),
+      .inst_addr_i (idex_ex_inst_addr),
+      .op1_i       (idex_ex_op1),
+      .op2_i       (idex_ex_op2),
+      .rd_addr_i   (idex_ex_rd_addr),
+      .rd_wen_i    (idex_ex_rd_wen),
+      .mem_data_i  (idex_ex_mem_data),
+      .mem_size_i  (idex_ex_mem_size),
+      .mem_we_i    (idex_ex_mem_we),
+      .mem_re_i    (idex_ex_mem_re),
+      .rs1_addr_i  (idex_ex_rs1_addr),   // 正确连接 5 位信号
+      .rs2_addr_i  (idex_ex_rs2_addr),   // 正确连接 5 位信号
+      .rd_addr_o   (ex_exmem_rd_addr),
+      .rd_data_o   (ex_exmem_rd_data),
+      .rd_wen_o    (ex_exmem_rd_wen),
+      .mem_addr_o  (ex_exmem_mem_addr),  // 直接输出到 RAM
+      .mem_data_o  (ex_exmem_mem_data),  // 直接输出到 RAM
+      .mem_size_o  (ex_exmem_mem_size),  // 直接输出到 RAM
+      .mem_we_o    (ex_exmem_mem_we),    // 直接输出到 RAM
+      .mem_re_o    (ex_exmem_mem_re),    // 直接输出到 RAM
+      .jump_addr_o (ex_ctrl_jump_addr),
+      .jump_en_o   (ex_ctrl_jump_en),
+      .hold_flag_o (ex_ctrl_hold_flag),
+      .mem_rd_data (mem_memwb_rd_data),  // 修正为 32 位数据
+      .mem_rd_addr (mem_memwb_rd_addr),  // 修正为 5 位地址
+      .mem_reg_wen (mem_memwb_rd_wen),
+      .mem_mem_re_i(mem_memwb_mem_re),
+      .wb_rd_data  (memwb_wb_rd_data),   // 修正为 32 位数据
+      .wb_rd_addr  (memwb_wb_rd_addr),   // 修正为 5 位地址
+      .wb_reg_wen  (memwb_wb_rd_wen),
+      .wb_mem_re_i (memwb_wb_mem_re),
+      .ram_data_i  (mem_memwb_ram_data)
   );
 
-  // EX/MEM Pipeline Register
+  // EX/MEM Pipeline Register - 传递 RAM 数据
   ex_mem u_ex_mem (
-      .clk       (clk),
-      .rst       (rst),
-      .rd_addr_i (ex_exmem_rd_addr),
-      .rd_data_i (ex_exmem_rd_data),
-      .rd_wen_i  (ex_exmem_rd_wen),
-      .mem_addr_i(ex_exmem_mem_addr),
-      .mem_data_i(ex_exmem_mem_data),
-      .mem_we_i  (ex_exmem_mem_we),
-      .mem_re_i  (ex_exmem_mem_re),
-      .mem_size_i(ex_exmem_mem_size),
-      .rd_addr_o (exmem_mem_rd_addr),
-      .rd_data_o (exmem_mem_rd_data),
-      .rd_wen_o  (exmem_mem_rd_wen),
-      .mem_addr_o(exmem_mem_mem_addr),
-      .mem_data_o(exmem_mem_mem_data),
-      .mem_we_o  (exmem_mem_mem_we),
-      .mem_re_o  (exmem_mem_mem_re),
-      .mem_size_o(exmem_mem_mem_size)
+      .clk      (clk),
+      .rst      (rst),
+      .rd_addr_i(ex_exmem_rd_addr),
+      .rd_data_i(ex_exmem_rd_data),
+      .rd_wen_i (ex_exmem_rd_wen),
+      .mem_re_i (ex_exmem_mem_re),
+      .rd_addr_o(exmem_mem_rd_addr),
+      .rd_data_o(exmem_mem_rd_data),
+      .rd_wen_o (exmem_mem_rd_wen),
+      .mem_re_o (exmem_mem_mem_re)
   );
 
-  // Memory (MEM)
+  // Memory (MEM) - 处理 RAM 数据
   mem u_mem (
       .rd_addr_i (exmem_mem_rd_addr),
       .rd_data_i (exmem_mem_rd_data),
       .rd_wen_i  (exmem_mem_rd_wen),
-      .mem_addr_i(exmem_mem_mem_addr),
-      .mem_data_i(exmem_mem_mem_data),
-      .mem_we_i  (exmem_mem_mem_we),
+      .ram_data_i(data_i),
       .mem_re_i  (exmem_mem_mem_re),
-      .mem_size_i(exmem_mem_mem_size),
-      .ram_data_i(ram_mem_data),        // 来自外部 RAM 的数据
-      .mem_addr_o(mem_ram_addr),
-      .mem_data_o(mem_ram_data),
-      .mem_we_o  (mem_ram_we),
-      .mem_re_o  (mem_ram_re),
-      .mem_size_o(mem_ram_size),
       .rd_addr_o (mem_memwb_rd_addr),
       .rd_data_o (mem_memwb_rd_data),
-      .rd_wen_o  (mem_memwb_rd_wen)
+      .rd_wen_o  (mem_memwb_rd_wen),
+      .ram_data_o(mem_memwb_ram_data),
+      .mem_re_o  (mem_memwb_mem_re)
   );
 
   // MEM/WB Pipeline Register
   mem_wb u_mem_wb (
-      .clk      (clk),
-      .rst      (rst),
-      .rd_addr_i(mem_memwb_rd_addr),
-      .rd_data_i(mem_memwb_rd_data),
-      .rd_wen_i (mem_memwb_rd_wen),
-      .rd_addr_o(memwb_wb_rd_addr),
-      .rd_data_o(memwb_wb_rd_data),
-      .rd_wen_o (memwb_wb_rd_wen)
+      .clk       (clk),
+      .rst       (rst),
+      .rd_addr_i (mem_memwb_rd_addr),
+      .rd_data_i (mem_memwb_rd_data),
+      .rd_wen_i  (mem_memwb_rd_wen),
+      .ram_data_i(mem_memwb_ram_data),
+      .mem_re_i  (mem_memwb_mem_re),
+      .rd_addr_o (memwb_wb_rd_addr),
+      .rd_data_o (memwb_wb_rd_data),
+      .rd_wen_o  (memwb_wb_rd_wen),
+      .ram_data_o(memwb_wb_ram_data),
+      .mem_re_o  (memwb_wb_mem_re)
   );
 
   // Write Back (WB)
   wb u_wb (
-      .rd_addr_i(memwb_wb_rd_addr),
-      .rd_data_i(memwb_wb_rd_data),
-      .rd_wen_i (memwb_wb_rd_wen),
-      .rd_addr_o(wb_regs_rd_addr),
-      .rd_data_o(wb_regs_rd_data),
-      .rd_wen_o (wb_regs_rd_wen)
+      .rd_addr_i (memwb_wb_rd_addr),
+      .rd_data_i (memwb_wb_rd_data),
+      .rd_wen_i  (memwb_wb_rd_wen),
+      .ram_data_i(memwb_wb_ram_data),
+      .mem_re_i  (memwb_wb_mem_re),
+      .rd_addr_o (wb_regs_rd_addr),
+      .rd_data_o (wb_regs_rd_data),
+      .rd_wen_o  (wb_regs_rd_wen)
   );
 
   // Control Unit
