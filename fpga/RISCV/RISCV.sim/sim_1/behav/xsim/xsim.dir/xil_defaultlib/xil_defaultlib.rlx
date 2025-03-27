@@ -1,0 +1,25 @@
+0.7
+2020.2
+May  7 2023
+15:24:31
+E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/fpga/RISCV/RISCV.sim/sim_1/behav/xsim/glbl.v,1683266558,verilog,,,,glbl,,,,,,,,
+E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/common/control.v,1741790029,verilog,,E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/top/cpu_top.v,,control,,,,,,,,
+E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/common/defines.v,1741864444,verilog,,,,,,,,,,,,
+E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id.v,1742716208,verilog,,E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id_ex.v,E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/common/defines.v,id,,,,,,,,
+E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id_ex.v,1742654331,verilog,,E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/if.v,E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/common/defines.v,id_ex,,,,,,,,
+E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/regs.v,1742111276,verilog,,E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/writeback/wb.v,,regs,,,,,,,,
+E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/execute/ex.v,1742716785,verilog,,E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/execute/ex_mem.v,E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/common/defines.v,ex,,,,,,,,
+E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/execute/ex_mem.v,1742741699,verilog,,E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id.v,,ex_mem,,,,,,,,
+E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/if.v,1742046440,verilog,,E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/if_id.v,,iF,,,,,,,,
+E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/if_id.v,1742047362,verilog,,E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/memory/mem.v,E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/common/defines.v,if_id,,,,,,,,
+E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/pc_reg.v,1741868618,verilog,,E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/regs.v,,pc_reg,,,,,,,,
+E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/memory/mem.v,1742651945,verilog,,E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/memory/mem_wb.v,,mem,,,,,,,,
+E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/memory/mem_wb.v,1742650836,verilog,,E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/pc_reg.v,,mem_wb,,,,,,,,
+E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/top/cpu_top.v,1742656229,verilog,,E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/cpu_top_soc.v,,cpu_top,,,,,,,,
+E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/writeback/wb.v,1742649984,verilog,,E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/sim/testcases/tb.v,,wb,,,,,,,,
+E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/cpu_top_soc.v,1742211147,verilog,,E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/utils/dff_set.v,,cpu_top_soc,,,,,,,,
+E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/perips/RAM.v,1742132687,verilog,,E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/perips/ROM.v,,ram,,,,,,,,
+E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/perips/ROM.v,1742048387,verilog,,E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/common/control.v,,rom,,,,,,,,
+E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/utils/dff_set.v,1742115700,verilog,,E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/utils/dff_set_hold.v,,dff_set,,,,,,,,
+E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/utils/dff_set_hold.v,1742047449,verilog,,E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/execute/ex.v,,dff_set_hold,,,,,,,,
+E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/sim/testcases/tb.v,1742826387,verilog,,,,tb,,,,,,,,

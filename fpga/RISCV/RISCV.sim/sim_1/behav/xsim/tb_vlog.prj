@@ -1,0 +1,27 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  \
+"../../../../../../rtl/perips/RAM.v" \
+"../../../../../../rtl/perips/ROM.v" \
+"../../../../../../rtl/core/common/control.v" \
+"../../../../../../rtl/core/top/cpu_top.v" \
+"../../../../../../rtl/cpu_top_soc.v" \
+"../../../../../../rtl/utils/dff_set.v" \
+"../../../../../../rtl/utils/dff_set_hold.v" \
+"../../../../../../rtl/core/execute/ex.v" \
+"../../../../../../rtl/core/execute/ex_mem.v" \
+"../../../../../../rtl/core/decode/id.v" \
+"../../../../../../rtl/core/decode/id_ex.v" \
+"../../../../../../rtl/core/fetch/if.v" \
+"../../../../../../rtl/core/fetch/if_id.v" \
+"../../../../../../rtl/core/memory/mem.v" \
+"../../../../../../rtl/core/memory/mem_wb.v" \
+"../../../../../../rtl/core/fetch/pc_reg.v" \
+"../../../../../../rtl/core/decode/regs.v" \
+"../../../../../../rtl/core/writeback/wb.v" \
+"../../../../../../sim/testcases/tb.v" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort
