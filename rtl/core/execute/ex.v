@@ -278,7 +278,7 @@ module ex (
       end
       `INST_TYPE_L: begin
         case (funct3)
-          `INST_LB, `INST_LH, `INST_LW: begin
+          `INST_LB, `INST_LH, `INST_LW, `INST_LHU, `INST_LBU: begin
             mem_we_o   = mem_we_i;
             mem_re_o   = mem_re_i;
             mem_addr_o = op1 + op2;

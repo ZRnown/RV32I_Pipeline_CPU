@@ -71,8 +71,8 @@ module ram (
           3'b000:  mem_data_o <= {{24{mem_data_i[7]}}, mem_data_i[7:0]};  // lb
           3'b001:  mem_data_o <= {{16{mem_data_i[15]}}, mem_data_i[15:0]};  // lh
           3'b010:  mem_data_o <= mem_data_i;  // lw
-          3'b011:  mem_data_o <= {24'b0, mem_data_i[7:0]};  // lbu
-          3'b100:  mem_data_o <= {16'b0, mem_data_i[15:0]};  // lhu
+          3'b100:  mem_data_o <= {24'b0, mem_data_i[7:0]};  // lbu
+          3'b101:  mem_data_o <= {16'b0, mem_data_i[15:0]};  // lhu
           default: mem_data_o <= 32'b0;
         endcase
       end else begin
@@ -95,7 +95,7 @@ module ram (
           3'b010: begin  // lw (字加载)
             mem_data_o <= memory[word_addr];
           end
-          3'b011: begin  // lbu (无符号字节加载)
+          3'b100: begin  // lbu (无符号字节加载)
             case (byte_offset)
               2'b00: mem_data_o <= {24'b0, memory[word_addr][7:0]};
               2'b01: mem_data_o <= {24'b0, memory[word_addr][15:8]};
@@ -103,7 +103,7 @@ module ram (
               2'b11: mem_data_o <= {24'b0, memory[word_addr][31:24]};
             endcase
           end
-          3'b100: begin  // lhu (无符号半字加载)
+          3'b101: begin  // lhu (无符号半字加载)
             case (byte_offset[1])
               1'b0: mem_data_o <= {16'b0, memory[word_addr][15:0]};
               1'b1: mem_data_o <= {16'b0, memory[word_addr][31:16]};

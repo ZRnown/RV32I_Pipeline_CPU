@@ -15,7 +15,7 @@ module tb;
   end
   initial begin
     $readmemh(
-        "E:\\Files\\Electron\\FPGA\\RV32I_Pipeline_CPU\\sim\\testcases\\generated\\rv32ui-p-lbu.bin",
+        "E:\\Files\\Electron\\FPGA\\RV32I_Pipeline_CPU\\sim\\testcases\\generated\\inst_data.txt",
         tb.u_cpu_top_soc.u_rom.ROM);
   end
   // initial begin
