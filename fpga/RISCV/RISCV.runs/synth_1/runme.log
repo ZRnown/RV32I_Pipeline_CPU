@@ -14,16 +14,21 @@ ECHO is off.
     ** Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
 
 source cpu_top_soc.tcl -notrace
-create_project: Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 437.277 ; gain = 164.957
+create_project: Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 437.531 ; gain = 162.762
+Command: read_checkpoint -auto_incremental -incremental E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/fpga/RISCV/RISCV.srcs/utils_1/imports/synth_1/cpu_top_soc.dcp
+INFO: [Vivado 12-5825] Read reference checkpoint from E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/fpga/RISCV/RISCV.srcs/utils_1/imports/synth_1/cpu_top_soc.dcp for incremental synthesis
+INFO: [Vivado 12-7989] Please ensure there are no constraint changes
 Command: synth_design -top cpu_top_soc -part xc7k325tffg900-2
 Starting synth_design
 Attempting to get a license for feature 'Synthesis' and/or device 'xc7k325t'
 INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7k325t'
+INFO: [Designutils 20-5440] No compile time benefit to using incremental synthesis; A full resynthesis will be run
+INFO: [Designutils 20-4379] Flow is switching to default flow due to incremental criteria not met. If you would like to alter this behaviour and have the flow terminate instead, please set the following parameter config_implementation {autoIncr.Synth.RejectBehavior Terminate}
 INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 2 processes.
 INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
-INFO: [Synth 8-7075] Helper process launched with PID 26284
+INFO: [Synth 8-7075] Helper process launched with PID 34084
 ---------------------------------------------------------------------------------
-Starting Synthesize : Time (s): cpu = 00:00:03 ; elapsed = 00:00:03 . Memory (MB): peak = 884.336 ; gain = 422.176
+Starting Synthesize : Time (s): cpu = 00:00:04 ; elapsed = 00:00:04 . Memory (MB): peak = 886.172 ; gain = 410.840
 ---------------------------------------------------------------------------------
 INFO: [Synth 8-6157] synthesizing module 'cpu_top_soc' [E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/cpu_top_soc.v:1]
 INFO: [Synth 8-6157] synthesizing module 'cpu_top' [E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/top/cpu_top.v:1]
@@ -37,8 +42,8 @@ INFO: [Synth 8-6157] synthesizing module 'dff_set_hold' [E:/Files/Electron/FPGA/
 INFO: [Synth 8-6155] done synthesizing module 'dff_set_hold' (0#1) [E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/utils/dff_set_hold.v:2]
 INFO: [Synth 8-6155] done synthesizing module 'if_id' (0#1) [E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/if_id.v:4]
 INFO: [Synth 8-6157] synthesizing module 'id' [E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id.v:3]
-INFO: [Synth 8-226] default block is never used [E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id.v:43]
-INFO: [Synth 8-226] default block is never used [E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id.v:71]
+INFO: [Synth 8-226] default block is never used [E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id.v:69]
+INFO: [Synth 8-226] default block is never used [E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id.v:97]
 INFO: [Synth 8-6155] done synthesizing module 'id' (0#1) [E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id.v:3]
 INFO: [Synth 8-6157] synthesizing module 'id_ex' [E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id_ex.v:2]
 INFO: [Synth 8-6157] synthesizing module 'dff_set_hold__parameterized0' [E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/utils/dff_set_hold.v:2]
@@ -187,46 +192,54 @@ WARNING: [Synth 8-3848] Net ROM in module/entity rom does not have driver. [E:/F
 WARNING: [Synth 8-3848] Net ROM in module/entity rom does not have driver. [E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/perips/ROM.v:6]
 WARNING: [Synth 8-3848] Net ROM in module/entity rom does not have driver. [E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/perips/ROM.v:6]
 INFO: [Common 17-14] Message 'Synth 8-3848' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
-WARNING: [Synth 8-7129] Port mem_addr_i[31] in module ram is either unconnected or has no load
-WARNING: [Synth 8-7129] Port mem_addr_i[30] in module ram is either unconnected or has no load
-WARNING: [Synth 8-7129] Port mem_addr_i[29] in module ram is either unconnected or has no load
-WARNING: [Synth 8-7129] Port mem_addr_i[28] in module ram is either unconnected or has no load
-WARNING: [Synth 8-7129] Port mem_addr_i[27] in module ram is either unconnected or has no load
-WARNING: [Synth 8-7129] Port mem_addr_i[26] in module ram is either unconnected or has no load
-WARNING: [Synth 8-7129] Port mem_addr_i[25] in module ram is either unconnected or has no load
-WARNING: [Synth 8-7129] Port mem_addr_i[24] in module ram is either unconnected or has no load
-WARNING: [Synth 8-7129] Port mem_addr_i[23] in module ram is either unconnected or has no load
-WARNING: [Synth 8-7129] Port mem_addr_i[22] in module ram is either unconnected or has no load
-WARNING: [Synth 8-7129] Port mem_addr_i[21] in module ram is either unconnected or has no load
-WARNING: [Synth 8-7129] Port mem_addr_i[20] in module ram is either unconnected or has no load
-WARNING: [Synth 8-7129] Port mem_addr_i[19] in module ram is either unconnected or has no load
-WARNING: [Synth 8-7129] Port mem_addr_i[18] in module ram is either unconnected or has no load
-WARNING: [Synth 8-7129] Port mem_addr_i[17] in module ram is either unconnected or has no load
-WARNING: [Synth 8-7129] Port mem_addr_i[16] in module ram is either unconnected or has no load
-WARNING: [Synth 8-7129] Port mem_addr_i[15] in module ram is either unconnected or has no load
-WARNING: [Synth 8-7129] Port mem_addr_i[14] in module ram is either unconnected or has no load
+WARNING: [Synth 8-4767] Trying to implement RAM ' ' in registers. Block RAM or DRAM implementation is not possible; see log for reasons.
+	1: Invalid write to RAM. 
+	2: Unable to determine number of words or word size in RAM. 
+	3: No valid read/write found for RAM. 
+RAM dissolved into registers
+WARNING: [Synth 8-4767] Trying to implement RAM ' ' in registers. Block RAM or DRAM implementation is not possible; see log for reasons.
+	1: Invalid write to RAM. 
+	2: Unable to determine number of words or word size in RAM. 
+	3: No valid read/write found for RAM. 
+RAM dissolved into registers
+WARNING: [Synth 8-4767] Trying to implement RAM ' ' in registers. Block RAM or DRAM implementation is not possible; see log for reasons.
+	1: Invalid write to RAM. 
+	2: Unable to determine number of words or word size in RAM. 
+	3: No valid read/write found for RAM. 
+RAM dissolved into registers
+WARNING: [Synth 8-4767] Trying to implement RAM ' ' in registers. Block RAM or DRAM implementation is not possible; see log for reasons.
+	1: Invalid write to RAM. 
+	2: Unable to determine number of words or word size in RAM. 
+	3: No valid read/write found for RAM. 
+RAM dissolved into registers
+WARNING: [Synth 8-4767] Trying to implement RAM 'memory_reg' in registers. Block RAM or DRAM implementation is not possible; see log for reasons.
+Reason is one or more of the following :
+	1: Invalid write to RAM. 
+	2: Unable to determine number of words or word size in RAM. 
+	3: No valid read/write found for RAM. 
+RAM "memory_reg" dissolved into registers
 WARNING: [Synth 8-7129] Port inst_i[19] in module ex is either unconnected or has no load
 WARNING: [Synth 8-7129] Port inst_i[18] in module ex is either unconnected or has no load
 WARNING: [Synth 8-7129] Port inst_i[17] in module ex is either unconnected or has no load
 WARNING: [Synth 8-7129] Port inst_i[16] in module ex is either unconnected or has no load
 WARNING: [Synth 8-7129] Port inst_i[15] in module ex is either unconnected or has no load
 ---------------------------------------------------------------------------------
-Finished Synthesize : Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 1049.488 ; gain = 587.328
+Finished Synthesize : Time (s): cpu = 00:00:21 ; elapsed = 00:00:25 . Memory (MB): peak = 1874.508 ; gain = 1399.176
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Constraint Validation : Time (s): cpu = 00:00:05 ; elapsed = 00:00:06 . Memory (MB): peak = 1049.488 ; gain = 587.328
+Finished Constraint Validation : Time (s): cpu = 00:00:24 ; elapsed = 00:00:28 . Memory (MB): peak = 1874.508 ; gain = 1399.176
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Loading Part and Timing Information
 ---------------------------------------------------------------------------------
 Loading part: xc7k325tffg900-2
 ---------------------------------------------------------------------------------
-Finished Loading Part and Timing Information : Time (s): cpu = 00:00:05 ; elapsed = 00:00:06 . Memory (MB): peak = 1049.488 ; gain = 587.328
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:24 ; elapsed = 00:00:28 . Memory (MB): peak = 1874.508 ; gain = 1399.176
 ---------------------------------------------------------------------------------
 INFO: [Device 21-403] Loading part xc7k325tffg900-2
-WARNING: [Synth 8-327] inferring latch for variable 'mem_data_o_reg' [E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id.v:122]
+WARNING: [Synth 8-327] inferring latch for variable 'mem_data_o_reg' [E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id.v:148]
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:09 ; elapsed = 00:00:07 . Memory (MB): peak = 1156.070 ; gain = 693.910
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:11:16 ; elapsed = 00:11:51 . Memory (MB): peak = 3514.246 ; gain = 3038.914
 ---------------------------------------------------------------------------------
 No constraint files found.
 ---------------------------------------------------------------------------------
@@ -234,39 +247,39 @@ Start RTL Component Statistics
 ---------------------------------------------------------------------------------
 Detailed RTL Component Info : 
 +---Adders : 
-	   2 Input   32 Bit       Adders := 5     
+	   2 Input   32 Bit       Adders := 6     
 	   3 Input   32 Bit       Adders := 1     
 +---XORs : 
 	   2 Input     32 Bit         XORs := 1     
 +---Registers : 
-	               32 Bit    Registers := 44    
+	               32 Bit    Registers := 2092  
 	                5 Bit    Registers := 5     
 	                3 Bit    Registers := 1     
 	                1 Bit    Registers := 7     
-+---RAMs : 
-	             128K Bit	(4096 X 32 bit)          RAMs := 1     
 +---Muxes : 
-	   2 Input   32 Bit        Muxes := 48    
+	   7 Input 65536 Bit        Muxes := 1     
+	   2 Input 65536 Bit        Muxes := 2     
+	   2 Input   32 Bit        Muxes := 16439 
 	   7 Input   32 Bit        Muxes := 1     
 	   8 Input   32 Bit        Muxes := 1     
 	   4 Input   32 Bit        Muxes := 2     
-	   6 Input   32 Bit        Muxes := 2     
+	   6 Input   32 Bit        Muxes := 1     
 	  10 Input   32 Bit        Muxes := 3     
 	   2 Input   16 Bit        Muxes := 1     
 	   4 Input    8 Bit        Muxes := 1     
-	   2 Input    8 Bit        Muxes := 1     
-	   2 Input    5 Bit        Muxes := 15    
+	   2 Input    5 Bit        Muxes := 14    
 	  10 Input    5 Bit        Muxes := 1     
 	   3 Input    5 Bit        Muxes := 2     
 	   8 Input    4 Bit        Muxes := 1     
 	  10 Input    3 Bit        Muxes := 5     
 	   6 Input    3 Bit        Muxes := 1     
-	   2 Input    3 Bit        Muxes := 3     
+	   2 Input    3 Bit        Muxes := 4     
 	  10 Input    2 Bit        Muxes := 2     
 	   2 Input    2 Bit        Muxes := 1     
 	   3 Input    2 Bit        Muxes := 1     
-	   2 Input    1 Bit        Muxes := 49    
+	   2 Input    1 Bit        Muxes := 50    
 	  10 Input    1 Bit        Muxes := 8     
+	   7 Input    1 Bit        Muxes := 1     
 ---------------------------------------------------------------------------------
 Finished RTL Component Statistics 
 ---------------------------------------------------------------------------------
@@ -283,24 +296,61 @@ No constraint files found.
 ---------------------------------------------------------------------------------
 Start Cross Boundary and Area Optimization
 ---------------------------------------------------------------------------------
-WARNING: [Synth 8-7080] Parallel synthesis criteria is not met
-INFO: [Synth 8-6851] RAM (u_ram/memory_reg) has partial Byte Wide Write Enable pattern, however no output register found in fanout of RAM. Recommended to use supported Byte Wide Write Enable template. 
-INFO: [Synth 8-6851] RAM (u_ram/memory_reg) has partial Byte Wide Write Enable pattern, however no output register found in fanout of RAM. Recommended to use supported Byte Wide Write Enable template. 
+INFO: [Synth 8-5546] ROM "u_id/mem_data_o" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "u_id/mem_data_o" won't be mapped to RAM because it is too sparse
+WARNING: [Synth 8-7129] Port inst_i[19] in module ex is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inst_i[18] in module ex is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inst_i[17] in module ex is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inst_i[16] in module ex is either unconnected or has no load
+WARNING: [Synth 8-7129] Port inst_i[15] in module ex is either unconnected or has no load
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][31] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][0] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][1] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][2] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][3] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][4] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][5] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][6] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][7] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][8] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][9] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][10] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][11] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][12] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][13] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][14] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][15] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][16] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][17] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][18] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][19] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][20] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][21] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][22] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][23] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][24] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][25] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][26] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][27] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][28] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][29] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (u_regs/\regs_reg[0][30] )
 ---------------------------------------------------------------------------------
-Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:13 ; elapsed = 00:00:12 . Memory (MB): peak = 1291.469 ; gain = 829.309
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:29:37 ; elapsed = 00:31:29 . Memory (MB): peak = 3886.383 ; gain = 3411.051
 ---------------------------------------------------------------------------------
 No constraint files found.
 ---------------------------------------------------------------------------------
 Start Timing Optimization
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Timing Optimization : Time (s): cpu = 00:00:13 ; elapsed = 00:00:12 . Memory (MB): peak = 1291.469 ; gain = 829.309
+Finished Timing Optimization : Time (s): cpu = 00:30:28 ; elapsed = 00:32:21 . Memory (MB): peak = 3886.383 ; gain = 3411.051
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Technology Mapping
 ---------------------------------------------------------------------------------
+WARNING: [Synth 8-7080] Parallel synthesis criteria is not met
 ---------------------------------------------------------------------------------
-Finished Technology Mapping : Time (s): cpu = 00:00:13 ; elapsed = 00:00:12 . Memory (MB): peak = 1291.469 ; gain = 829.309
+Finished Technology Mapping : Time (s): cpu = 00:30:28 ; elapsed = 00:32:22 . Memory (MB): peak = 3886.383 ; gain = 3411.051
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start IO Insertion
@@ -318,37 +368,37 @@ Start Final Netlist Cleanup
 Finished Final Netlist Cleanup
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished IO Insertion : Time (s): cpu = 00:00:16 ; elapsed = 00:00:15 . Memory (MB): peak = 1291.469 ; gain = 829.309
+Finished IO Insertion : Time (s): cpu = 00:30:33 ; elapsed = 00:32:27 . Memory (MB): peak = 3886.383 ; gain = 3411.051
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Instances
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Instances : Time (s): cpu = 00:00:16 ; elapsed = 00:00:15 . Memory (MB): peak = 1291.469 ; gain = 829.309
+Finished Renaming Generated Instances : Time (s): cpu = 00:30:33 ; elapsed = 00:32:27 . Memory (MB): peak = 3886.383 ; gain = 3411.051
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Rebuilding User Hierarchy
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:16 ; elapsed = 00:00:15 . Memory (MB): peak = 1291.469 ; gain = 829.309
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:30:33 ; elapsed = 00:32:27 . Memory (MB): peak = 3886.383 ; gain = 3411.051
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Ports
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Ports : Time (s): cpu = 00:00:16 ; elapsed = 00:00:15 . Memory (MB): peak = 1291.469 ; gain = 829.309
+Finished Renaming Generated Ports : Time (s): cpu = 00:30:33 ; elapsed = 00:32:27 . Memory (MB): peak = 3886.383 ; gain = 3411.051
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:00:16 ; elapsed = 00:00:15 . Memory (MB): peak = 1291.469 ; gain = 829.309
+Finished Handling Custom Attributes : Time (s): cpu = 00:30:33 ; elapsed = 00:32:27 . Memory (MB): peak = 3886.383 ; gain = 3411.051
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Nets
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Nets : Time (s): cpu = 00:00:16 ; elapsed = 00:00:15 . Memory (MB): peak = 1291.469 ; gain = 829.309
+Finished Renaming Generated Nets : Time (s): cpu = 00:30:33 ; elapsed = 00:32:27 . Memory (MB): peak = 3886.383 ; gain = 3411.051
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Writing Synthesis Report
@@ -373,24 +423,24 @@ Report Instance Areas:
 |1     |top      |       |     0|
 +------+---------+-------+------+
 ---------------------------------------------------------------------------------
-Finished Writing Synthesis Report : Time (s): cpu = 00:00:16 ; elapsed = 00:00:15 . Memory (MB): peak = 1291.469 ; gain = 829.309
+Finished Writing Synthesis Report : Time (s): cpu = 00:30:33 ; elapsed = 00:32:27 . Memory (MB): peak = 3886.383 ; gain = 3411.051
 ---------------------------------------------------------------------------------
-Synthesis finished with 0 errors, 0 critical warnings and 4122 warnings.
-Synthesis Optimization Runtime : Time (s): cpu = 00:00:16 ; elapsed = 00:00:15 . Memory (MB): peak = 1291.469 ; gain = 829.309
-Synthesis Optimization Complete : Time (s): cpu = 00:00:16 ; elapsed = 00:00:15 . Memory (MB): peak = 1291.469 ; gain = 829.309
+Synthesis finished with 0 errors, 0 critical warnings and 4114 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:30:33 ; elapsed = 00:32:28 . Memory (MB): peak = 3886.383 ; gain = 3411.051
+Synthesis Optimization Complete : Time (s): cpu = 00:30:33 ; elapsed = 00:32:28 . Memory (MB): peak = 3886.383 ; gain = 3411.051
 INFO: [Project 1-571] Translating synthesized netlist
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1291.469 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.001 . Memory (MB): peak = 3886.383 ; gain = 0.000
 INFO: [Project 1-570] Preparing netlist for logic optimization
 INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1344.031 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3886.383 ; gain = 0.000
 INFO: [Project 1-111] Unisim Transformation Summary:
 No Unisim elements were transformed.
 
 Synth Design complete | Checksum: 6ebec65
 INFO: [Common 17-83] Releasing license: Synthesis
-63 Infos, 126 Warnings, 0 Critical Warnings and 0 Errors encountered.
+99 Infos, 118 Warnings, 0 Critical Warnings and 0 Errors encountered.
 synth_design completed successfully
-synth_design: Time (s): cpu = 00:00:19 ; elapsed = 00:00:17 . Memory (MB): peak = 1344.031 ; gain = 906.754
+synth_design: Time (s): cpu = 00:30:40 ; elapsed = 00:32:36 . Memory (MB): peak = 3886.383 ; gain = 3424.016
 INFO: [Common 17-1381] The checkpoint 'E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/fpga/RISCV/RISCV.runs/synth_1/cpu_top_soc.dcp' has been generated.
 INFO: [runtcl-4] Executing : report_utilization -file cpu_top_soc_utilization_synth.rpt -pb cpu_top_soc_utilization_synth.pb
-INFO: [Common 17-206] Exiting Vivado at Tue Mar 25 16:08:56 2025...
+INFO: [Common 17-206] Exiting Vivado at Wed Apr  2 16:04:57 2025...
