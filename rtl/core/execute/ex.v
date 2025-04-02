@@ -81,7 +81,7 @@ module ex (
     op1_i_less_op2_i_signed = ($signed(op1) < $signed(op2)) ? 1'b1 : 1'b0;
     op1_i_less_op2_i_unsigned = (op1 < op2) ? 1'b1 : 1'b0;
     // tpye I
-    SRA_mask = (32'hffff_ffff) >> op2[4:0];
+    SRA_mask = (32'hffff_ffff) >>> op2[4:0];
     rd_data_o   = 32'b0;
     rd_addr_o   = 5'b0;
     rd_wen_o    = 1'b0;
@@ -105,7 +105,7 @@ module ex (
             rd_wen_o  = 1'b1;
           end
           `INST_SLTI: begin
-            rd_data_o = {30'b0, op1_i_equal_op2_i};
+            rd_data_o = {30'b0, op1_i_less_op2_i_signed};
             rd_addr_o = rd_addr_i;
             rd_wen_o  = 1'b1;
           end
