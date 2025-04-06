@@ -59,7 +59,7 @@ module ex (
   reg op1_i_equal_op2_i;
   reg op1_i_less_op2_i_signed;
   reg op1_i_less_op2_i_unsigned;
-  reg [31:0] SRA_mask;
+  wire [31:0] SRA_mask = (32'hffff_ffff) >> op2_i[4:0];
   always @(*) begin
     // rs1 前递逻辑
     if (mem_reg_wen && mem_rd_addr != 5'b0 && mem_rd_addr == rs1_addr_i) begin
@@ -81,7 +81,6 @@ module ex (
     op1_i_less_op2_i_signed = ($signed(op1) < $signed(op2)) ? 1'b1 : 1'b0;
     op1_i_less_op2_i_unsigned = (op1 < op2) ? 1'b1 : 1'b0;
     // tpye I
-    SRA_mask = (32'hffff_ffff) >>> op2[4:0];
     rd_data_o   = 32'b0;
     rd_addr_o   = 5'b0;
     rd_wen_o    = 1'b0;

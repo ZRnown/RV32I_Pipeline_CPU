@@ -70,6 +70,11 @@ proc create_report { reportName command } {
   }
 }
 OPTRACE "synth_1" START { ROLLUP_AUTO }
+set_param checkpoint.writeSynthRtdsInDcp 1
+set_param chipscope.maxJobs 4
+set_param synth.incrementalSynthesisCache C:/Users/Administrator/AppData/Roaming/Xilinx/Vivado/.Xil/Vivado-8364-DESKTOP-0D9DK5P/incrSyn
+set_msg_config -id {Synth 8-256} -limit 10000
+set_msg_config -id {Synth 8-638} -limit 10000
 OPTRACE "Creating in-memory project" START { }
 create_project -in_memory -part xc7k325tffg900-2
 
@@ -84,9 +89,12 @@ set_property ip_output_repo e:/Files/Electron/FPGA/RV32I_Pipeline_CPU/fpga/RISCV
 set_property ip_cache_permissions {read write} [current_project]
 OPTRACE "Creating in-memory project" END { }
 OPTRACE "Adding files" START { }
+read_verilog -library xil_defaultlib -sv E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/cpu_top_soc.sv
 read_verilog -library xil_defaultlib {
   E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/perips/RAM.v
   E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/perips/ROM.v
+  E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/perips/UART.v
+  E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/bus/axi4_lite.v
   E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/common/control.v
   E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/top/cpu_top.v
   E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/utils/dff_set.v
@@ -103,7 +111,6 @@ read_verilog -library xil_defaultlib {
   E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/pc_reg.v
   E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/regs.v
   E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/writeback/wb.v
-  E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/cpu_top_soc.v
 }
 OPTRACE "Adding files" END { }
 # Mark all dcp files as not used in implementation to prevent them from being
@@ -114,6 +121,9 @@ OPTRACE "Adding files" END { }
 foreach dcp [get_files -quiet -all -filter file_type=="Design\ Checkpoint"] {
   set_property used_in_implementation false $dcp
 }
+read_xdc E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/fpga/RISCV/RISCV.srcs/constrs_1/new/cpu_top_soc.xdc
+set_property used_in_implementation false [get_files E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/fpga/RISCV/RISCV.srcs/constrs_1/new/cpu_top_soc.xdc]
+
 set_param ips.enableIPCacheLiteLoad 1
 
 read_checkpoint -auto_incremental -incremental E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/fpga/RISCV/RISCV.srcs/utils_1/imports/synth_1/cpu_top_soc.dcp

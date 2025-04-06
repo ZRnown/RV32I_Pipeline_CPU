@@ -69,7 +69,7 @@ def compile():
             os.path.join(rtl_dir, "core", "memory", "mem_wb.v"),
             os.path.join(rtl_dir, "core", "writeback", "wb.v"),
             os.path.join(rtl_dir, "core", "top", "cpu_top.v"),
-            os.path.join(rtl_dir, "cpu_top_soc.v"),
+            os.path.join(rtl_dir, "cpu_top_soc.sv"),
             os.path.join(rtl_dir, "perips", "RAM.v"),
             os.path.join(rtl_dir, "perips", "ROM.v"),
             os.path.join(rtl_dir, "utils", "dff_set.v"),

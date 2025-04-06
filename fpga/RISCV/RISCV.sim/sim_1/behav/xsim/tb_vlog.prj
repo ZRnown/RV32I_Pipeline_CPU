@@ -2,9 +2,10 @@
 verilog xil_defaultlib  \
 "../../../../../../rtl/perips/RAM.v" \
 "../../../../../../rtl/perips/ROM.v" \
+"../../../../../../rtl/perips/UART.v" \
+"../../../../../../rtl/bus/axi4_lite.v" \
 "../../../../../../rtl/core/common/control.v" \
 "../../../../../../rtl/core/top/cpu_top.v" \
-"../../../../../../rtl/cpu_top_soc.v" \
 "../../../../../../rtl/utils/dff_set.v" \
 "../../../../../../rtl/utils/dff_set_hold.v" \
 "../../../../../../rtl/core/execute/ex.v" \
@@ -18,6 +19,11 @@ verilog xil_defaultlib  \
 "../../../../../../rtl/core/fetch/pc_reg.v" \
 "../../../../../../rtl/core/decode/regs.v" \
 "../../../../../../rtl/core/writeback/wb.v" \
+
+sv xil_defaultlib  \
+"../../../../../../rtl/cpu_top_soc.sv" \
+
+verilog xil_defaultlib  \
 "../../../../../../sim/testcases/tb.v" \
 
 # compile glbl module

@@ -1,16 +1,36 @@
 module cpu_top (
-    input  wire        clk,
-    input  wire        rst,
-    // ROM
-    input  wire [31:0] inst_i,
-    output wire [31:0] inst_addr_o,
-    // RAM
-    output wire [31:0] data_addr_o,  // 数据地址输出到外部 RAM
-    output wire [31:0] data_o,       // 数据输出到外部 RAM（写数据）
+    input  wire        clk,          // 系统时钟
+    input  wire        rst,          // 复位（高有效）
+    // ROM 接口
+    input  wire [31:0] inst_i,       // 从 ROM 输入的指令
+    output wire [31:0] inst_addr_o,  // 输出到 ROM 的指令地址
+    // RAM 接口
+    output wire [31:0] data_addr_o,  // 数据地址输出到外部 RAM 或 AXI
+    output wire [31:0] data_o,       // 数据输出到外部 RAM 或 AXI（写数据）
     output wire        data_we_o,    // 数据写使能
     output wire        data_re_o,    // 数据读使能
     output wire [ 2:0] data_size_o,  // 数据大小（字节、半字、字）
-    input  wire [31:0] data_i        // 从外部 RAM 输入的数据
+    input  wire [31:0] data_i,       // 从外部 RAM 或 AXI 输入的数据
+    // AXI4-Lite 主设备接口
+    output wire [31:0] m_awaddr,     // 写地址
+    output wire [ 2:0] m_awprot,     // 写保护（默认 3'b000）
+    output wire        m_awvalid,    // 写地址有效
+    input  wire        m_awready,    // 写地址准备好
+    output wire [31:0] m_wdata,      // 写数据
+    output wire [ 3:0] m_wstrb,      // 字节选通
+    output wire        m_wvalid,     // 写数据有效
+    input  wire        m_wready,     // 写数据准备好
+    input  wire [ 1:0] m_bresp,      // 写响应
+    input  wire        m_bvalid,     // 写响应有效
+    output wire        m_bready,     // 主设备准备好接收响应
+    output wire [31:0] m_araddr,     // 读地址
+    output wire [ 2:0] m_arprot,     // 读保护（默认 3'b000）
+    output wire        m_arvalid,    // 读地址有效
+    input  wire        m_arready,    // 读地址准备好
+    input  wire [31:0] m_rdata,      // 读数据
+    input  wire [ 1:0] m_rresp,      // 读响应
+    input  wire        m_rvalid,     // 读数据有效
+    output wire        m_rready      // 主设备准备好接收数据
 );
 
   // 内部信号声明 - 按流水线阶段分组
