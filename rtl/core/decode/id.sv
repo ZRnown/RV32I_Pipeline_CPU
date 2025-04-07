@@ -1,5 +1,5 @@
 // id => instruction decode 译码阶段
-`include "../common/defines.v"
+`include "../common/defines.sv"
 module id (
     // from if_id
     input  wire [31:0] inst_i,

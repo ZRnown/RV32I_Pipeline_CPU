@@ -1,0 +1,38 @@
+Time resolution is 1 ps
+UART TX: x at time                    0
+############################
+########  fail  !!!#########
+############################
+fail testnum =  0
+x 0 register value is          0
+x 1 register value is         20
+x 2 register value is          6
+x 3 register value is          2
+x 4 register value is          0
+x 5 register value is          0
+x 6 register value is          0
+x 7 register value is          0
+x 8 register value is          0
+x 9 register value is          0
+x10 register value is          0
+x11 register value is          0
+x12 register value is          0
+x13 register value is          0
+x14 register value is          0
+x15 register value is          0
+x16 register value is          0
+x17 register value is          0
+x18 register value is          0
+x19 register value is          0
+x20 register value is          0
+x21 register value is          0
+x22 register value is          0
+x23 register value is          0
+x24 register value is          0
+x25 register value is          0
+x26 register value is          1
+x27 register value is          0
+x28 register value is          0
+x29 register value is          2
+x30 register value is          4
+$finish called at time : 540 ns : File "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/sim/testcases/tb.v" Line 44

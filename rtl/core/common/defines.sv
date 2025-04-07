@@ -34,15 +34,6 @@
 `define INST_SR 3'b101
 `define INST_OR 3'b110
 `define INST_AND 3'b111
-// M type inst
-`define INST_MUL 3'b000
-`define INST_MULH 3'b001
-`define INST_MULHSU 3'b010
-`define INST_MULHU 3'b011
-`define INST_DIV 3'b100
-`define INST_DIVU 3'b101
-`define INST_REM 3'b110
-`define INST_REMU 3'b111
 
 // J type inst
 `define INST_JAL 7'b1101111

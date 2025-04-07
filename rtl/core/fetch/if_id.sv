@@ -1,5 +1,5 @@
 // 介于if和id之间的寄存器
-`include "../common/defines.v"
+`include "../common/defines.sv"
 
 module if_id (
     input wire clk,

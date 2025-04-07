@@ -24,9 +24,9 @@ module csr_reg(
 
     // form ex
     input wire we_i,                        // ex模块写寄存器标志
-    input wire[`MemAddrBus] raddr_i,        // ex模块读寄存器地址
-    input wire[`MemAddrBus] waddr_i,        // ex模块写寄存器地址
-    input wire[`RegBus] data_i,             // ex模块写寄存器数据
+    input wire[4:0] raddr_i,        // ex模块读寄存器地址
+    input wire[4:0] waddr_i,        // ex模块写寄存器地址
+    input wire[31:0] data_i,             // ex模块写寄存器数据
 
     // from clint
     input wire clint_we_i,                  // clint模块写寄存器标志
@@ -37,14 +37,12 @@ module csr_reg(
     output wire global_int_en_o,            // 全局中断使能标志
 
     // to clint
-    output reg[`RegBus] clint_data_o,       // clint模块读寄存器数据
-    output wire[`RegBus] clint_csr_mtvec,   // mtvec
-    output wire[`RegBus] clint_csr_mepc,    // mepc
-    output wire[`RegBus] clint_csr_mstatus, // mstatus
-
+    output reg[31:0] clint_data_o,       // clint模块读寄存器数据
+    output wire[31:0] clint_csr_mtvec,   // mtvec
+    output wire[31:0] clint_csr_mepc,    // mepc
+    output wire[31:0] clint_csr_mstatus, // mstatus
     // to ex
     output reg[`RegBus] data_o              // ex模块读寄存器数据
-
     );
 
     reg[`DoubleRegBus] cycle;

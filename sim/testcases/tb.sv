@@ -27,7 +27,7 @@ module tb;
 
   // 加载指令到 ROM
   initial begin
-    $readmemh("E:\\Files\\Electron\\FPGA\\RV32I_Pipeline_CPU\\sim\\testcases\\user_test\\test.hex",
+    $readmemh("E:\\Files\\Electron\\FPGA\\RV32I_Pipeline_CPU\\sim\\testcases\\inst_test\\rv32ui-p-sra.txt",
               tb.u_cpu_top_soc.u_rom.ROM);
   end
   // 测试结果判断
@@ -51,25 +51,25 @@ module tb;
   end
 
   // 监测 UART 输出
-  reg [9:0] uart_shift;  // 10位：起始位 + 8位数据 + 停止位
-  reg [3:0] bit_count;
-  initial begin
-    uart_shift = 10'b0;
-    bit_count  = 0;
-  end
-  always @(posedge clk) begin
-    if (tx !== 1'b1) begin
-      if (bit_count == 0 && tx == 1'b0) begin  // 检测起始位
-        bit_count <= bit_count + 1;
-      end else if (bit_count > 0 && bit_count < 10) begin
-        uart_shift[bit_count-1] <= tx;
-        bit_count <= bit_count + 1;
-      end else if (bit_count == 10) begin
-        $display("UART TX Data: %c (ASCII %d) at time %t", uart_shift[8:1], uart_shift[8:1], $time);
-        bit_count <= 0;
-      end
-    end
-  end
+  // reg [9:0] uart_shift;  // 10位：起始位 + 8位数据 + 停止位
+  // reg [3:0] bit_count;
+  // initial begin
+  //   uart_shift = 10'b0;
+  //   bit_count  = 0;
+  // end
+  // always @(posedge clk) begin
+  //   if (tx !== 1'b1) begin
+  //     if (bit_count == 0 && tx == 1'b0) begin  // 检测起始位
+  //       bit_count <= bit_count + 1;
+  //     end else if (bit_count > 0 && bit_count < 10) begin
+  //       uart_shift[bit_count-1] <= tx;
+  //       bit_count <= bit_count + 1;
+  //     end else if (bit_count == 10) begin
+  //       $display("UART TX Data: %c (ASCII %d) at time %t", uart_shift[8:1], uart_shift[8:1], $time);
+  //       bit_count <= 0;
+  //     end
+  //   end
+  // end
 
   // 实例化顶层模块
   cpu_top_soc u_cpu_top_soc (
