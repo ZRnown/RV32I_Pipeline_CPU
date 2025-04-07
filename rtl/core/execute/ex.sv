@@ -59,8 +59,6 @@ module ex (
   reg op1_i_equal_op2_i;
   reg op1_i_less_op2_i_signed;
   reg op1_i_less_op2_i_unsigned;
-  wire [31:0] op1_i_shift_left_op2_i = op1_i << op2_i;
-  wire [31:0] op1_i_shift_right_op2_i = op1_i >> op2_i;
   wire [31:0] SRA_mask = (32'hffff_ffff) >> op2_i[4:0];
   always @(*) begin
     // rs1 前递逻辑
@@ -137,11 +135,11 @@ module ex (
           end
           `INST_SRI: begin
             if (funct7[5] == 1'b1) begin
-              rd_data_o = ((op1_i_shift_right_op2_i) & SRA_mask) | ({32{op1_i[31]}} & (~SRA_mask));
+              rd_data_o = ((op1 >> shamt) & SRA_mask) | ({32{op1[31]}} & (~SRA_mask));
               rd_addr_o = rd_addr_i;
               rd_wen_o  = 1'b1;
             end else begin
-              rd_data_o = op1_i_shift_right_op2_i;
+              rd_data_o = op1 >> op2[4:0];
               rd_addr_o = rd_addr_i;
               rd_wen_o  = 1'b1;
             end
@@ -201,11 +199,11 @@ module ex (
           end
           `INST_SR: begin
             if (funct7[5] == 1'b1) begin
-              rd_data_o = ((op1_i_shift_right_op2_i) & SRA_mask) | ({32{op1_i[31]}} & (~SRA_mask));
+              rd_data_o = ((op1 >> op2[4:0]) & SRA_mask) | ({32{op1_i[31]}} & (~SRA_mask));
               rd_addr_o = rd_addr_i;
               rd_wen_o  = 1'b1;
             end else begin
-              rd_data_o = op1_i_shift_right_op2_i;
+              rd_data_o = op1 >> op2[4:0];
               rd_addr_o = rd_addr_i;
               rd_wen_o  = 1'b1;
             end

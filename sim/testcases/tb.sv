@@ -27,7 +27,7 @@ module tb;
 
   // 加载指令到 ROM
   initial begin
-    $readmemh("E:\\Files\\Electron\\FPGA\\RV32I_Pipeline_CPU\\sim\\testcases\\inst_test\\rv32ui-p-sra.txt",
+    $readmemh("E:\\Files\\Electron\\FPGA\\RV32I_Pipeline_CPU\\sim\\testcases\\generated\\inst_data.txt",
               tb.u_cpu_top_soc.u_rom.ROM);
   end
   // 测试结果判断

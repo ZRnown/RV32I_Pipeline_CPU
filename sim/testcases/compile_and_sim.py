@@ -51,29 +51,31 @@ def compile():
     iverilog_cmd = ["iverilog", "-o", "out.vvp"]
     iverilog_cmd += ["-I", os.path.join(rtl_dir, "core", "common")]
     # 测试台文件
-    iverilog_cmd.append(os.path.join(root_dir, "sim", "testcases", "tb.v"))
+    iverilog_cmd.append(os.path.join(root_dir, "sim", "testcases", "tb.sv"))
     # RTL 文件
     iverilog_cmd.extend(
         [
-            os.path.join(rtl_dir, "core", "common", "defines.v"),
-            os.path.join(rtl_dir, "core", "common", "control.v"),
-            os.path.join(rtl_dir, "core", "fetch", "pc_reg.v"),
-            os.path.join(rtl_dir, "core", "fetch", "if.v"),
-            os.path.join(rtl_dir, "core", "fetch", "if_id.v"),
-            os.path.join(rtl_dir, "core", "decode", "id.v"),
-            os.path.join(rtl_dir, "core", "decode", "id_ex.v"),
-            os.path.join(rtl_dir, "core", "decode", "regs.v"),
-            os.path.join(rtl_dir, "core", "execute", "ex.v"),
-            os.path.join(rtl_dir, "core", "execute", "ex_mem.v"),
-            os.path.join(rtl_dir, "core", "memory", "mem.v"),
-            os.path.join(rtl_dir, "core", "memory", "mem_wb.v"),
-            os.path.join(rtl_dir, "core", "writeback", "wb.v"),
-            os.path.join(rtl_dir, "core", "top", "cpu_top.v"),
+            os.path.join(rtl_dir, "core", "common", "defines.sv"),
+            os.path.join(rtl_dir, "core", "common", "control.sv"),
+            os.path.join(rtl_dir, "core", "fetch", "pc_reg.sv"),
+            os.path.join(rtl_dir, "core", "fetch", "if.sv"),
+            os.path.join(rtl_dir, "core", "fetch", "if_id.sv"),
+            os.path.join(rtl_dir, "core", "decode", "id.sv"),
+            os.path.join(rtl_dir, "core", "decode", "id_ex.sv"),
+            os.path.join(rtl_dir, "core", "decode", "regs.sv"),
+            os.path.join(rtl_dir, "core", "execute", "ex.sv"),
+            os.path.join(rtl_dir, "core", "execute", "ex_mem.sv"),
+            os.path.join(rtl_dir, "core", "memory", "mem.sv"),
+            os.path.join(rtl_dir, "core", "memory", "mem_wb.sv"),
+            os.path.join(rtl_dir, "core", "writeback", "wb.sv"),
+            os.path.join(rtl_dir, "core", "top", "cpu_top.sv"),
             os.path.join(rtl_dir, "cpu_top_soc.sv"),
-            os.path.join(rtl_dir, "perips", "RAM.v"),
-            os.path.join(rtl_dir, "perips", "ROM.v"),
-            os.path.join(rtl_dir, "utils", "dff_set.v"),
-            os.path.join(rtl_dir, "utils", "dff_set_hold.v"),
+            os.path.join(rtl_dir, "perips", "RAM.sv"),
+            os.path.join(rtl_dir, "perips", "ROM.sv"),
+            os.path.join(rtl_dir, "utils", "dff_set.sv"),
+            os.path.join(rtl_dir, "utils", "dff_set_hold.sv"),
+            os.path.join(rtl_dir, "bus", "axi4_lite.sv"),
+            os.path.join(rtl_dir, "perips", "UART.sv"),
         ]
     )
 

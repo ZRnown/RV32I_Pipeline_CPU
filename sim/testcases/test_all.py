@@ -22,7 +22,7 @@ def main():
         index = file_bin.index("-p-")
         print_name = file_bin[index + 3 : -4]
 
-        if r.find("pass") != -1:
+        if r.find("PASS") != -1:
             print("指令  " + print_name.ljust(10, " ") + "    PASS")
         else:
             print("指令  " + print_name.ljust(10, " ") + "    !!!FAIL!!!")
