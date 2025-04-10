@@ -144,6 +144,24 @@ module cpu_top (
   wire        ctrl_pc_jump_en;  // Control 到 PC 的跳转使能
   wire        ctrl_hold_flag;  // Control 到各阶段的流水线暂停标志
 
+  // Clint to Control and EX
+  wire        clint_ctrl_hold_flag;  // Clint 到 Control 的流水线暂停标志
+  wire [31:0] clint_ex_int_addr;  // Clint 到 EX 的中断入口地址
+  wire        clint_ex_int_assert;  // Clint 到 EX 的中断标志
+
+  // Clint to CSR
+  wire        clint_csr_we;  // Clint 到 CSR 的写使能
+  wire [31:0] clint_csr_waddr;  // Clint 到 CSR 的写地址
+  wire [31:0] clint_csr_raddr;  // Clint 到 CSR 的读地址
+  wire [31:0] clint_csr_wdata;  // Clint 到 CSR 的写数据
+
+  // CSR to Clint
+  wire [31:0] csr_clint_data;  // CSR 到 Clint 的数据
+  wire [31:0] csr_clint_mtvec;  // CSR 到 Clint 的 mtvec 寄存器值
+  wire [31:0] csr_clint_mepc;  // CSR 到 Clint 的 mepc 寄存器值
+  wire [31:0] csr_clint_mstatus;  // CSR 到 Clint 的 mstatus 寄存器值
+  wire        csr_clint_global_int_en;  // CSR 到 Clint 的全局中断使能
+
   // EX 阶段直接连接到外部 RAM 接口
   assign data_addr_o = ex_exmem_mem_addr;
   assign data_o      = ex_exmem_mem_wdata;
@@ -296,7 +314,9 @@ module cpu_top (
       .csr_wen_i   (idex_ex_csr_wen),
       .csr_wdata_o (ex_csr_wdata),
       .csr_waddr_o (ex_csr_waddr),
-      .csr_wen_o   (ex_csr_wen)
+      .csr_wen_o   (ex_csr_wen),
+      .int_assert_i(clint_ex_int_assert),
+      .int_addr_i  (clint_ex_int_addr)
   );
 
   // EX/MEM Pipeline Register
@@ -357,12 +377,13 @@ module cpu_top (
 
   // Control Unit
   control u_control (
-      .jump_addr_i   (ex_ctrl_jump_addr),
-      .jump_en_i     (ex_ctrl_jump_en),
-      .hold_flag_ex_i(ex_ctrl_hold_flag),
-      .jump_addr_o   (ctrl_pc_jump_addr),
-      .jump_en_o     (ctrl_pc_jump_en),
-      .hold_flag_o   (ctrl_hold_flag)
+      .jump_addr_i      (ex_ctrl_jump_addr),
+      .jump_en_i        (ex_ctrl_jump_en),
+      .hold_flag_ex_i   (ex_ctrl_hold_flag),
+      .hold_flag_clint_i(clint_ctrl_hold_flag),
+      .jump_addr_o      (ctrl_pc_jump_addr),
+      .jump_en_o        (ctrl_pc_jump_en),
+      .hold_flag_o      (ctrl_hold_flag)
   );
 
   // Register File
@@ -378,6 +399,30 @@ module cpu_top (
       .reg_wen    (wb_regs_reg_wen)
   );
 
+  // Clint Module
+  clint u_clint (
+      .clk            (clk),
+      .rst            (rst),
+      .int_flag_i     (),                         // 未连接
+      .inst_i         (if_ifid_inst),
+      .inst_addr_i    (if_ifid_pc_addr),
+      .jump_flag_i    (ex_ctrl_jump_en),
+      .jump_addr_i    (ex_ctrl_jump_addr),
+      .hold_flag_i    (ctrl_hold_flag),
+      .data_i         (csr_clint_data),
+      .csr_mtvec      (csr_clint_mtvec),
+      .csr_mepc       (csr_clint_mepc),
+      .csr_mstatus    (csr_clint_mstatus),
+      .global_int_en_i(csr_clint_global_int_en),
+      .hold_flag_o    (clint_ctrl_hold_flag),
+      .we_o           (clint_csr_we),
+      .waddr_o        (clint_csr_waddr),
+      .raddr_o        (clint_csr_raddr),
+      .data_o         (clint_csr_wdata),
+      .int_addr_o     (clint_ex_int_addr),
+      .int_assert_o   (clint_ex_int_assert)
+  );
+
   // CSR Register
   csr_reg u_csr_reg (
       .clk              (clk),
@@ -386,15 +431,15 @@ module cpu_top (
       .raddr_i          (id_csr_raddr),
       .waddr_i          (ex_csr_waddr),
       .data_i           (ex_csr_wdata),
-      .clint_we_i       (),              // 未连接，留空以支持后续扩展
-      .clint_raddr_i    (),              // 未连接
-      .clint_waddr_i    (),              // 未连接
-      .clint_data_i     (),              // 未连接
-      .global_int_en_o  (),              // 未连接
-      .clint_data_o     (),              // 未连接
-      .clint_csr_mtvec  (),              // 未连接
-      .clint_csr_mepc   (),              // 未连接
-      .clint_csr_mstatus(),              // 未连接
+      .clint_we_i       (clint_csr_we),
+      .clint_raddr_i    (clint_csr_raddr),
+      .clint_waddr_i    (clint_csr_waddr),
+      .clint_data_i     (clint_csr_wdata),
+      .global_int_en_o  (csr_clint_global_int_en),
+      .clint_data_o     (csr_clint_data),
+      .clint_csr_mtvec  (csr_clint_mtvec),
+      .clint_csr_mepc   (csr_clint_mepc),
+      .clint_csr_mstatus(csr_clint_mstatus),
       .data_o           (csr_id_rdata)
   );
 

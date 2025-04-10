@@ -31,11 +31,14 @@ module ex (
     input  wire        wb_mem_re_i,
     // from RAM
     input  wire [31:0] ram_data_i,
+    // from clint
+    input  wire        int_assert_i,  // 中断发生标志
+    input  wire [31:0] int_addr_i,    // 中断跳转地址
     // to ex_mem
     output reg  [ 4:0] rd_addr_o,
     output reg  [31:0] rd_data_o,
     output reg         rd_wen_o,
-    // csr regs
+    // to csr regs
     output reg  [31:0] csr_wdata_o,
     output reg  [31:0] csr_waddr_o,
     output reg         csr_wen_o,
