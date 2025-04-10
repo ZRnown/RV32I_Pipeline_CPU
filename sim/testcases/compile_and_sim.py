@@ -56,6 +56,7 @@ def compile():
     iverilog_cmd.extend(
         [
             os.path.join(rtl_dir, "core", "common", "defines.sv"),
+            os.path.join(rtl_dir, "core", "clint", "csr_reg.sv"),
             os.path.join(rtl_dir, "core", "common", "control.sv"),
             os.path.join(rtl_dir, "core", "fetch", "pc_reg.sv"),
             os.path.join(rtl_dir, "core", "fetch", "if.sv"),

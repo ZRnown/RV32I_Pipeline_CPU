@@ -14,6 +14,11 @@ module ex (
     input  wire        mem_re_i,
     input  wire [ 4:0] rs1_addr_i,
     input  wire [ 4:0] rs2_addr_i,
+    input  wire [31:0] csr_rdata_i,
+    input  wire [31:0] csr_waddr_i,
+    input  wire        csr_wen_i,
+    input  wire [31:0] rs1_data_i,
+    input  wire [31:0] rs2_data_i,
     // from mem (数据前递)
     input  wire [31:0] mem_rd_data,   // MEM 阶段的数据
     input  wire [ 4:0] mem_rd_addr,   // MEM 阶段的目标寄存器地址
@@ -30,6 +35,10 @@ module ex (
     output reg  [ 4:0] rd_addr_o,
     output reg  [31:0] rd_data_o,
     output reg         rd_wen_o,
+    // csr regs
+    output reg  [31:0] csr_wdata_o,
+    output reg  [31:0] csr_waddr_o,
+    output reg         csr_wen_o,
     // to RAM
     output reg  [31:0] mem_addr_o,    // 访存地址（如 LW/SW 的地址）
     output reg  [31:0] mem_data_o,    // 写入内存的数据（SW 指令）
@@ -49,6 +58,7 @@ module ex (
   wire [4:0] rs2 = inst_i[24:20];
   wire [6:0] funct7 = inst_i[31:25];
   wire [11:0] imm = inst_i[31:20];
+  wire [4:0] uimm = inst_i[19:15];
   wire [4:0] shamt = inst_i[24:20];
   // branch imm
   wire [31:0] jump_imm = {
@@ -296,6 +306,53 @@ module ex (
             rd_addr_o  = 5'b0;
             rd_wen_o   = 1'b0;
             rd_data_o  = 32'b0;
+          end
+        endcase
+      end
+      `INST_CSR: begin
+        jump_en_o = 1'b0;
+        hold_flag_o = 1'b0;
+        jump_addr_o = 32'b0;
+        mem_data_o = 32'b0;
+        mem_addr_o = 32'b0;
+        mem_size_o = 3'b0;
+        mem_we_o = 1'b0;
+        mem_re_o = 1'b0;
+        case (funct3)
+          `INST_CSRRW: begin
+            csr_wdata_o = rs1_data_i;
+            rd_data_o   = csr_rdata_i;
+          end
+          `INST_CSRRS: begin
+            csr_wdata_o = rs1_data_i | csr_rdata_i;
+            rd_data_o   = csr_rdata_i;
+          end
+          `INST_CSRRC: begin
+            csr_wdata_o = csr_rdata_i & (~rs1_data_i);
+            rd_data_o   = csr_rdata_i;
+          end
+          `INST_CSRRWI: begin
+            csr_wdata_o = {27'h0, uimm};
+            rd_data_o   = csr_rdata_i;
+          end
+          `INST_CSRRSI: begin
+            csr_wdata_o = {27'h0, uimm} | csr_rdata_i;
+            rd_data_o   = csr_rdata_i;
+          end
+          `INST_CSRRCI: begin
+            csr_wdata_o = (~{27'h0, uimm}) & csr_rdata_i;
+            rd_data_o   = csr_rdata_i;
+          end
+          default: begin
+            jump_en_o = 1'b0;
+            hold_flag_o = 1'b0;
+            jump_addr_o = 32'b0;
+            mem_data_o = 32'b0;
+            mem_addr_o = 32'b0;
+            mem_size_o = 3'b0;
+            mem_we_o = 1'b0;
+            mem_re_o = 1'b0;
+            rd_data_o = 32'b0;
           end
         endcase
       end

@@ -1,3 +1,5 @@
+`define True 1'b1
+`define False 1'b0
 // I type inst
 `define INST_TYPE_I 7'b0010011
 `define INST_ADDI 3'b000

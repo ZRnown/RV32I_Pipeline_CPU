@@ -10,6 +10,10 @@ module id (
     // from regs
     input  wire [31:0] rs1_data_i,
     input  wire [31:0] rs2_data_i,
+    // to csr reg
+    output reg  [31:0] csr_raddr_o,    // 读CSR寄存器地址
+    // from csr reg
+    input  wire [31:0] csr_rdata_i,    // CSR寄存器输入数据
     // 前递输入（从 EX 和 MEM 阶段）
     input  wire [ 4:0] ex_rd_addr_i,   // EX 阶段的目标寄存器地址
     input  wire [31:0] ex_result_i,    // EX 阶段的计算结果
@@ -27,25 +31,32 @@ module id (
     output reg  [ 2:0] mem_size_o,
     output reg  [31:0] mem_data_o,
     output reg         mem_we_o,       // 写内存使能
-    output reg         mem_re_o        // 读内存使能
+    output reg         mem_re_o,       // 读内存使能
+    output reg  [31:0] csr_waddr_o,
+    output reg  [31:0] csr_rdata_o,
+    output reg         csr_wen,
+    output reg  [31:0] rs1_data_o,
+    output reg  [31:0] rs2_data_o
 );
   // 指令解析
-  wire [6:0] opcode = inst_i[6:0];
+  wire [ 6:0] opcode = inst_i[6:0];
   wire [11:0] imm = inst_i[31:20];
   wire [11:0] s_imm = {inst_i[31:25], inst_i[11:7]};  // S-type 立即数
-  wire [4:0] rs1 = inst_i[19:15];
-  wire [4:0] rs2 = inst_i[24:20];
-  wire [4:0] rd = inst_i[11:7];
-  wire [2:0] funct3 = inst_i[14:12];
-  wire [6:0] funct7 = inst_i[31:25];
-  wire [4:0] shamt = inst_i[24:20];
+  wire [ 4:0] rs1 = inst_i[19:15];
+  wire [ 4:0] rs2 = inst_i[24:20];
+  wire [ 4:0] rd = inst_i[11:7];
+  wire [ 2:0] funct3 = inst_i[14:12];
+  wire [ 6:0] funct7 = inst_i[31:25];
+  wire [ 4:0] shamt = inst_i[24:20];
   // 前递逻辑
-  reg [31:0] rs1_data;
-  reg [31:0] rs2_data;
+  reg  [31:0] rs1_data;
+  reg  [31:0] rs2_data;
   always @(*) begin
     // 默认使用寄存器文件的数据
-    rs1_data = rs1_data_i;
-    rs2_data = rs2_data_i;
+    rs1_data   = rs1_data_i;
+    rs2_data   = rs2_data_i;
+    rs1_data_o = rs1_data_i;
+    rs2_data_o = rs2_data_i;
     if (mem_reg_wen_i && (mem_rd_addr_i != 5'b0) && (mem_rd_addr_i == rs1)) begin
       rs1_data = mem_result_i;
     end
@@ -230,6 +241,37 @@ module id (
         op2_o      = inst_addr_i;
         rd_addr_o  = rd;
         reg_wen    = 1'b1;
+      end
+      `INST_CSR: begin
+        reg_wen = 1'b1;
+        rd_addr_o = 5'b0;
+        rs1_addr_o = 5'b0;
+        rs1_addr_o = 5'b0;
+        csr_raddr_o = {20'h0, inst_i[31:20]};
+        csr_waddr_o = {20'h0, inst_i[31:20]};
+        case (funct3)
+          `INST_CSRRW, `INST_CSRRS, `INST_CSRRC: begin
+            rs1_addr_o = rs1;
+            rs1_addr_o = 5'b0;
+            reg_wen = 1'b0;
+            rd_addr_o = rd;
+            csr_wen = 1'b0;
+          end
+          `INST_CSRRWI, `INST_CSRRSI, `INST_CSRRCI: begin
+            rs1_addr_o = 5'b0;
+            rs1_addr_o = 5'b0;
+            reg_wen = 1'b0;
+            rd_addr_o = rd;
+            csr_wen = 1'b0;
+          end
+          default: begin
+            reg_wen = 1'b0;
+            rd_addr_o = 5'b0;
+            rs1_addr_o = 5'b0;
+            rs1_addr_o = 5'b0;
+            csr_wen = 1'b0;
+          end
+        endcase
       end
       default: begin
         rs1_addr_o = 5'b0;
