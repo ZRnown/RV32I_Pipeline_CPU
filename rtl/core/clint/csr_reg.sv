@@ -8,7 +8,7 @@ module csr_reg (
 
     // form ex
     input wire        we_i,     // ex模块写寄存器标志
-    input wire [31:0] raddr_i,  // ex模块读寄存器地址
+    input wire [31:0] raddr_i,  // id模块读寄存器地址
     input wire [31:0] waddr_i,  // ex模块写寄存器地址
     input wire [31:0] data_i,   // ex模块写寄存器数据
 

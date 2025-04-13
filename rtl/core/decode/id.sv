@@ -53,10 +53,11 @@ module id (
   reg  [31:0] rs2_data;
   always @(*) begin
     // 默认使用寄存器文件的数据
-    rs1_data   = rs1_data_i;
-    rs2_data   = rs2_data_i;
+    rs1_data = rs1_data_i;
+    rs2_data = rs2_data_i;
     rs1_data_o = rs1_data_i;
     rs2_data_o = rs2_data_i;
+    csr_rdata_o = csr_rdata_i;
     if (mem_reg_wen_i && (mem_rd_addr_i != 5'b0) && (mem_rd_addr_i == rs1)) begin
       rs1_data = mem_result_i;
     end
