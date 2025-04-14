@@ -1,10 +1,9 @@
 module tb;
-  reg                                                              clk;  // 时钟
-  reg                                                              rst;  // 复位
-  reg                                                              rx;  // UART 输入
-  wire                                                             tx;  // UART 输出
-  wire    [ 3:0]                                                   led;  // LED 输出
-  integer                                                          r;
+  reg            clk;  // 时钟
+  reg            rst;  // 复位
+  reg            rx;  // UART 输入
+  wire           tx;  // UART 输出
+  integer        r;
 
   // 访问 CPU 内部寄存器（假设寄存器模块为 u_regs）
   wire    [31:0] x3 = tb.u_cpu_top_soc.u_cpu_top.u_regs.regs[3];
@@ -27,8 +26,9 @@ module tb;
 
   // 加载指令到 ROM
   initial begin
-    $readmemh("E:\\Files\\Electron\\FPGA\\RV32I_Pipeline_CPU\\sim\\testcases\\generated\\inst_data.txt",
-              tb.u_cpu_top_soc.u_rom.ROM);
+    $readmemh(
+        "E:\\Files\\Electron\\FPGA\\RV32I_Pipeline_CPU\\sim\\testcases\\generated\\inst_data.txt",
+        tb.u_cpu_top_soc.u_rom.ROM);
   end
   // 测试结果判断
   initial begin
@@ -76,8 +76,7 @@ module tb;
       .clk(clk),
       .rst(rst),
       .rx (rx),
-      .tx (tx),
-      .led(led)
+      .tx (tx)
   );
 
 endmodule

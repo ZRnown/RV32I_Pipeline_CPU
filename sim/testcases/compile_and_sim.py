@@ -56,6 +56,15 @@ def compile():
     iverilog_cmd.extend(
         [
             os.path.join(rtl_dir, "core", "common", "defines.sv"),
+            os.path.join(rtl_dir, "utils", "dff_set.sv"),
+            os.path.join(rtl_dir, "utils", "dff_set_hold.sv"),
+            os.path.join(rtl_dir, "perips", "TIMER.sv"),
+            os.path.join(rtl_dir, "perips", "UART.sv"),
+            os.path.join(rtl_dir, "perips", "GPIO.sv"),
+            os.path.join(rtl_dir, "perips", "SPI.sv"),
+            os.path.join(rtl_dir, "bus", "rib.sv"),
+            os.path.join(rtl_dir, "perips", "RAM.sv"),
+            os.path.join(rtl_dir, "perips", "ROM.sv"),
             os.path.join(rtl_dir, "core", "clint", "csr_reg.sv"),
             os.path.join(rtl_dir, "core", "clint", "clint.sv"),
             os.path.join(rtl_dir, "core", "common", "control.sv"),
@@ -72,12 +81,6 @@ def compile():
             os.path.join(rtl_dir, "core", "writeback", "wb.sv"),
             os.path.join(rtl_dir, "core", "top", "cpu_top.sv"),
             os.path.join(rtl_dir, "cpu_top_soc.sv"),
-            os.path.join(rtl_dir, "perips", "RAM.sv"),
-            os.path.join(rtl_dir, "perips", "ROM.sv"),
-            os.path.join(rtl_dir, "utils", "dff_set.sv"),
-            os.path.join(rtl_dir, "utils", "dff_set_hold.sv"),
-            os.path.join(rtl_dir, "bus", "axi4_lite.sv"),
-            os.path.join(rtl_dir, "perips", "UART.sv"),
         ]
     )
 
