@@ -10,9 +10,10 @@ module cpu_top (
     output wire        data_we_o,    // 数据写使能
     output wire        data_re_o,    // 数据读使能
     output wire [ 2:0] data_size_o,  // 数据大小（字节、半字、字）
-    input  wire [31:0] data_i        // 从外部 RAM 或 AXI 输入的数据
+    input  wire [31:0] data_i,       // 从外部 RAM 或 AXI 输入的数据
+    input  wire [ 7:0] int_i,
+    input  wire        hold_flag_i
 );
-
   // 内部信号声明 - 按流水线阶段分组
   // PC to IF
   wire [31:0] pc_if_pc_addr;  // PC 输出到 IF 的程序计数器地址
@@ -148,6 +149,7 @@ module cpu_top (
   assign data_we_o   = ex_exmem_mem_we;
   assign data_re_o   = ex_exmem_mem_re;
   assign data_size_o = ex_exmem_mem_size;
+  assign inst_addr_o = pc_if_pc_addr;
 
   // 模块实例化
   // Program Counter (PC)
@@ -374,8 +376,8 @@ module cpu_top (
       .reg2_addr_i(id_regs_rs2_addr),
       .reg1_data_o(regs_id_rs1_data),
       .reg2_data_o(regs_id_rs2_data),
-      .reg_waddr_i(wb_regs_rd_addr),
-      .reg_wdata_i(wb_regs_rd_data),
+      .reg_addr_i (wb_regs_rd_addr),
+      .reg_data_i (wb_regs_rd_data),
       .reg_wen    (wb_regs_reg_wen)
   );
 

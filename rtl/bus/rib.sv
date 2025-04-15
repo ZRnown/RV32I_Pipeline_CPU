@@ -42,6 +42,7 @@ module rib (
     output reg  [31:0] s1_data_o,  // 从设备1写数据
     input  wire [31:0] s1_data_i,  // 从设备1读取到的数据
     output reg         s1_we_o,    // 从设备1写标志
+    output reg         s1_re_o,    // 从设备1写标志
     output reg  [ 2:0] s1_size_o,  // 从设备1数据大小
 
     // slave 2 interface

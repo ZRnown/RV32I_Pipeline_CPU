@@ -5,56 +5,204 @@ module cpu_top_soc (
     output wire tx    // UART 发送引脚
 );
 
-  // CPU 与 ROM 的信号
-  wire [31:0] cpu_top_addr_o;  // CPU 输出到 ROM 的指令地址
-  wire [31:0] cpu_top_inst_i;  // ROM 输出到 CPU 的指令
+  // CPU 到 ROM 的信号（指令获取）
+  wire [31:0] cpu_to_rom_addr;  // CPU 输出到 ROM 的指令地址
+  wire [31:0] rom_to_cpu_inst;  // ROM 输出到 CPU 的指令
 
-  // CPU 与 RAM 或 AXI 的信号
-  wire [31:0] data_addr;  // CPU 输出到 RAM 或 AXI 的数据地址
-  wire [31:0] data_to_ram;  // CPU 输出到 RAM 或 AXI 的写数据
-  wire [31:0] data_from_ram;  // RAM 或 AXI 输出到 CPU 的读数据
-  wire        data_we;  // 数据写使能
-  wire        data_re;  // 数据读使能
-  wire [ 2:0] data_size;  // 数据大小（字节、半字、字）
+  // CPU 到总线的信号（数据访问）
+  wire [31:0] cpu_to_bus_addr;  // CPU 输出到总线的数据地址
+  wire [31:0] cpu_to_bus_data;  // CPU 输出到总线的写数据
+  wire [31:0] bus_to_cpu_data;  // 总线返回到 CPU 的读数据
+  wire        cpu_to_bus_we;  // 数据写使能
+  wire        cpu_to_bus_re;  // 数据读使能
+  wire [ 2:0] cpu_to_bus_size;  // 数据大小（字节、半字、字）
+  wire        cpu_to_bus_req;  // CPU 数据请求信号
+
+  // 总线到从设备的信号
+  wire [31:0] slave0_addr;  // ROM 地址
+  wire [31:0] slave0_data_o;  // ROM 写数据（未使用）
+  wire [31:0] slave0_data_i;  // ROM 读数据
+  wire        slave0_we;  // ROM 写使能（未使用）
+
+  wire [31:0] slave1_addr;  // RAM 地址
+  wire [31:0] slave1_data_o;  // RAM 写数据
+  wire [31:0] slave1_data_i;  // RAM 读数据
+  wire        slave1_we;  // RAM 写使能
+
+  wire [31:0] slave2_addr;  // Timer 地址
+  wire [31:0] slave2_data_o;  // Timer 写数据
+  wire [31:0] slave2_data_i;  // Timer 读数据
+  wire        slave2_we;  // Timer 写使能
+
+  wire [31:0] slave3_addr;  // UART 地址
+  wire [31:0] slave3_data_o;  // UART 写数据
+  wire [31:0] slave3_data_i;  // UART 读数据
+  wire        slave3_we;  // UART 写使能
+
+  wire [31:0] slave4_addr;  // GPIO 地址
+  wire [31:0] slave4_data_o;  // GPIO 写数据
+  wire [31:0] slave4_data_i;  // GPIO 读数据
+  wire        slave4_we;  // GPIO 写使能
+
+  wire [31:0] slave5_addr;  // SPI 地址
+  wire [31:0] slave5_data_o;  // SPI 写数据
+  wire [31:0] slave5_data_i;  // SPI 读数据
+  wire        slave5_we;  // SPI 写使能
+  wire        slave1_re;
+  wire [ 2:0] slave1_size;
+  // 总线保持信号
+  wire        bus_hold_flag;
+
+  // 中断信号
+  wire        timer_int;
+  wire [ 7:0] int_flags;
+  assign int_flags = {7'b0, timer_int};
 
   // CPU 实例化
   cpu_top u_cpu_top (
       .clk        (clk),
       .rst        (rst),
-      .inst_i     (cpu_top_inst_i),  // 从 ROM 输入的指令
-      .inst_addr_o(cpu_top_addr_o),  // 输出到 ROM 的指令地址
-      .data_addr_o(data_addr),       // 输出到 RAM 或 AXI 的数据地址
-      .data_o     (data_to_ram),     // 输出到 RAM 或 AXI 的写数据
-      .data_we_o  (data_we),         // 数据写使能
-      .data_re_o  (data_re),         // 数据读使能
-      .data_size_o(data_size),       // 数据大小控制
-      .data_i     (data_from_ram)    // 从 RAM 或 AXI 输入的读数据
+      .inst_i     (rom_to_cpu_inst),  // 从 ROM 输入的指令
+      .inst_addr_o(cpu_to_rom_addr),  // 输出到 ROM 的指令地址
+      .data_addr_o(cpu_to_bus_addr),  // 输出到总线的数据地址
+      .data_o     (cpu_to_bus_data),  // 输出到总线的写数据
+      .data_we_o  (cpu_to_bus_we),    // 数据写使能
+      .data_re_o  (cpu_to_bus_re),    // 数据读使能
+      .data_size_o(cpu_to_bus_size),  // 数据大小控制
+      .data_i     (bus_to_cpu_data),  // 从总线输入的读数据
+      .int_i      (int_flags),        // 中断输入
+      .hold_flag_i(bus_hold_flag)     // 总线保持信号
   );
+
   // ROM 实例化（指令存储）
   rom u_rom (
-      .inst_addr_i(cpu_top_addr_o),  // 来自 CPU 的指令地址
-      .inst_o     (cpu_top_inst_i)   // 输出到 CPU 的指令
+      .clk   (clk),
+      .rst   (rst),
+      .we_i  (slave0_we),
+      .addr_i(slave0_addr),
+      .data_i(slave0_data_o),
+      .data_o(slave0_data_i)
   );
 
   // RAM 实例化（数据存储）
   ram u_ram (
-      .clk       (clk),
-      .mem_addr_i(data_addr),     // 来自 CPU 的数据地址
-      .mem_data_i(data_to_ram),   // 来自 CPU 的写数据
-      .mem_we_i  (data_we),       // 写使能
-      .mem_re_i  (data_re),       // 读使能
-      .mem_size_i(data_size),     // 数据大小
-      .mem_data_o(data_from_ram)  // 输出到 CPU 的读数据
+      .clk   (clk),
+      .mem_we_i  (slave1_we),
+      .mem_addr_i(slave1_addr),
+      .mem_data_i(slave1_data_o),
+      .mem_data_o(slave1_data_i),
+      .mem_re_i  (slave1_re),
+      .mem_size_i(slave1_size)
   );
 
+  // Timer 实例化
+  timer u_timer (
+      .clk   (clk),
+      .rst   (rst),
+      .we_i  (slave2_we),
+      .addr_i(slave2_addr),
+      .data_i(slave2_data_o),
+      .data_o(slave2_data_i),
+      .int_o (timer_int)
+  );
 
-  // UART 实例
+  // UART 实例化
   uart u_uart (
-      .clk(clk),
-      .rst(rst),
-      .rx (rx),
-      .tx (tx)
+      .clk   (clk),
+      .rst   (rst),
+      .we_i  (slave3_we),
+      .addr_i(slave3_addr),
+      .data_i(slave3_data_o),
+      .data_o(slave3_data_i),
+      .rx    (rx),
+      .tx    (tx)
   );
 
+  // GPIO 实例化
+  gpio u_gpio (
+      .clk   (clk),
+      .rst   (rst),
+      .we_i  (slave4_we),
+      .addr_i(slave4_addr),
+      .data_i(slave4_data_o),
+      .data_o(slave4_data_i)
+  );
+
+  // SPI 实例化
+  spi u_spi (
+      .clk   (clk),
+      .rst   (rst),
+      .we_i  (slave5_we),
+      .addr_i(slave5_addr),
+      .data_i(slave5_data_o),
+      .data_o(slave5_data_i)
+  );
+
+  // RIB 总线实例化
+  rib u_rib (
+      .clk        (clk),
+      .rst        (rst),
+      // Master 0: CPU 指令获取 (ROM)
+      .m0_addr_i  (cpu_to_rom_addr),
+      .m0_data_i  (32'h0),
+      .m0_data_o  (rom_to_cpu_inst),
+      .m0_req_i   (1'b1),
+      .m0_we_i    (1'b0),
+      // Master 1: CPU 数据访问 (RAM, Timer, UART, GPIO, SPI)
+      .m1_addr_i  (cpu_to_bus_addr),
+      .m1_data_i  (cpu_to_bus_data),
+      .m1_data_o  (bus_to_cpu_data),
+      .m1_req_i   (cpu_to_bus_req),
+      .m1_we_i    (cpu_to_bus_we),
+      // Master 2: 未使用
+      .m2_addr_i  (32'h0),
+      .m2_data_i  (32'h0),
+      .m2_data_o  (),
+      .m2_req_i   (1'b0),
+      .m2_we_i    (1'b0),
+      // Master 3: 未使用
+      .m3_addr_i  (32'h0),
+      .m3_data_i  (32'h0),
+      .m3_data_o  (),
+      .m3_req_i   (1'b0),
+      .m3_we_i    (1'b0),
+      // Slave 0: ROM
+      .s0_addr_o  (slave0_addr),
+      .s0_data_o  (slave0_data_o),
+      .s0_data_i  (slave0_data_i),
+      .s0_we_o    (slave0_we),
+      // Slave 1: RAM
+      .s1_addr_o  (slave1_addr),
+      .s1_data_o  (slave1_data_o),
+      .s1_data_i  (slave1_data_i),
+      .s1_we_o    (slave1_we),
+      .s1_re_o    (slave1_re),
+      .s1_size_o  (slave1_size),
+      // Slave 2: Timer
+      .s2_addr_o  (slave2_addr),
+      .s2_data_o  (slave2_data_o),
+      .s2_data_i  (slave2_data_i),
+      .s2_we_o    (slave2_we),
+      // Slave 3: UART
+      .s3_addr_o  (slave3_addr),
+      .s3_data_o  (slave3_data_o),
+      .s3_data_i  (slave3_data_i),
+      .s3_we_o    (slave3_we),
+      // Slave 4: GPIO
+      .s4_addr_o  (slave4_addr),
+      .s4_data_o  (slave4_data_o),
+      .s4_data_i  (slave4_data_i),
+      .s4_we_o    (slave4_we),
+      // Slave 5: SPI
+      .s5_addr_o  (slave5_addr),
+      .s5_data_o  (slave5_data_o),
+      .s5_data_i  (slave5_data_i),
+      .s5_we_o    (slave5_we),
+      // 总线保持信号
+      .hold_flag_o(bus_hold_flag)
+  );
+
+  // CPU 请求信号生成
+  assign cpu_to_bus_req = cpu_to_bus_we | cpu_to_bus_re;
 
 endmodule
