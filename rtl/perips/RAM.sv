@@ -7,9 +7,8 @@ module ram (
     input  wire [ 2:0] mem_size_i,  // 操作大小 (000: byte, 001: halfword, 010: word)
     output reg  [31:0] mem_data_o   // 读取数据输出
 );
-
   // 定义 4KB 内存，32 位宽，地址范围 0-4095
-  reg [31:0] memory[0:4095];
+  reg [31:0] memory[0:2047];
 
   // 地址解析
   wire [31:0] word_addr = mem_addr_i[31:2];  // 字地址（32 位对齐）

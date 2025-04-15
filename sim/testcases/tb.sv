@@ -30,6 +30,18 @@ module tb;
         "E:\\Files\\Electron\\FPGA\\RV32I_Pipeline_CPU\\sim\\testcases\\generated\\inst_data.txt",
         tb.u_cpu_top_soc.u_rom.ROM);
   end
+
+  // // 预存数据到 RAM
+  // initial begin
+  //   // 在复位期间加载数据
+  //   #50;  // 等待复位开始
+  //   tb.u_cpu_top_soc.u_ram.memory[32'h1000>>2] = 32'h00ff00ff;  // 0x1000
+  //   tb.u_cpu_top_soc.u_ram.memory[32'h1004>>2] = 32'hff00ff00;  // 0x1004
+  //   tb.u_cpu_top_soc.u_ram.memory[32'h1008>>2] = 32'h0ff00ff0;  // 0x1008
+  //   tb.u_cpu_top_soc.u_ram.memory[32'h100c>>2] = 32'hf00ff00f;  // 0x100c
+  //   tb.u_cpu_top_soc.u_ram.memory[32'h1020>>2] = 32'h00ff00ff;  // 0x1020
+  // end
+
   // 测试结果判断
   initial begin
     wait (x26 == 32'b1);  // 等待测试完成标志
@@ -49,27 +61,6 @@ module tb;
     end
     $finish();
   end
-
-  // 监测 UART 输出
-  // reg [9:0] uart_shift;  // 10位：起始位 + 8位数据 + 停止位
-  // reg [3:0] bit_count;
-  // initial begin
-  //   uart_shift = 10'b0;
-  //   bit_count  = 0;
-  // end
-  // always @(posedge clk) begin
-  //   if (tx !== 1'b1) begin
-  //     if (bit_count == 0 && tx == 1'b0) begin  // 检测起始位
-  //       bit_count <= bit_count + 1;
-  //     end else if (bit_count > 0 && bit_count < 10) begin
-  //       uart_shift[bit_count-1] <= tx;
-  //       bit_count <= bit_count + 1;
-  //     end else if (bit_count == 10) begin
-  //       $display("UART TX Data: %c (ASCII %d) at time %t", uart_shift[8:1], uart_shift[8:1], $time);
-  //       bit_count <= 0;
-  //     end
-  //   end
-  // end
 
   // 实例化顶层模块
   cpu_top_soc u_cpu_top_soc (

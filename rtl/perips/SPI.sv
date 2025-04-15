@@ -5,6 +5,10 @@ module spi (
     input  wire [31:0] data_i,
     output wire [31:0] data_o,
     input  wire        we_i
+    // input  wire        spi_mosi,
+    // input  wire        spi_miso,
+    // input  wire        spi_ss,
+    // input  wire        spi_clk
 
 );
 
