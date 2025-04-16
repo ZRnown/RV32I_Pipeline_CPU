@@ -203,7 +203,6 @@ module cpu_top_soc (
       .s5_data_o  (slave5_data_o),
       .s5_data_i  (slave5_data_i),
       .s5_we_o    (slave5_we),
-      // 总线保持信号
       .hold_flag_o(bus_hold_flag)
   );
 

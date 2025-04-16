@@ -14,134 +14,133 @@ module cpu_top (
     input  wire [ 7:0] int_i,
     input  wire        hold_flag_i
 );
-  // 内部信号声明 - 按流水线阶段分组
   // PC to IF
-  wire [31:0] pc_if_pc_addr;  // PC 输出到 IF 的程序计数器地址
+  wire [31:0] pc_if_pc_addr;
   wire        rib_ctrl_hold_flag = hold_flag_i;
+
   // IF to IF/ID
-  wire [31:0] if_ifid_inst;  // IF 到 IF/ID 的指令
-  wire [31:0] if_ifid_pc_addr;  // IF 到 IF/ID 的 PC 地址
+  wire [31:0] if_ifid_inst;
+  wire [31:0] if_ifid_pc_addr;
 
   // IF/ID to ID
-  wire [31:0] ifid_id_inst;  // IF/ID 到 ID 的指令
-  wire [31:0] ifid_id_pc_addr;  // IF/ID 到 ID 的 PC 地址
+  wire [31:0] ifid_id_inst;
+  wire [31:0] ifid_id_pc_addr;
 
   // ID to Regs
-  wire [ 4:0] id_regs_rs1_addr;  // ID 到寄存器堆的源寄存器 1 地址
-  wire [ 4:0] id_regs_rs2_addr;  // ID 到寄存器堆的源寄存器 2 地址
+  wire [ 4:0] id_regs_rs1_addr;
+  wire [ 4:0] id_regs_rs2_addr;
 
   // Regs to ID
-  wire [31:0] regs_id_rs1_data;  // 寄存器堆到 ID 的源寄存器 1 数据
-  wire [31:0] regs_id_rs2_data;  // 寄存器堆到 ID 的源寄存器 2 数据
+  wire [31:0] regs_id_rs1_data;
+  wire [31:0] regs_id_rs2_data;
 
   // ID to ID/EX
-  wire [31:0] id_idex_inst;  // ID 到 ID/EX 的指令
-  wire [31:0] id_idex_pc_addr;  // ID 到 ID/EX 的 PC 地址
-  wire [31:0] id_idex_op1;  // ID 到 ID/EX 的操作数 1
-  wire [31:0] id_idex_op2;  // ID 到 ID/EX 的操作数 2
-  wire [ 4:0] id_idex_rd_addr;  // ID 到 ID/EX 的目标寄存器地址
-  wire        id_idex_reg_wen;  // ID 到 ID/EX 的寄存器写使能
-  wire [ 2:0] id_idex_mem_size;  // ID 到 ID/EX 的内存访问大小
-  wire [31:0] id_idex_mem_wdata;  // ID 到 ID/EX 的内存写数据
-  wire        id_idex_mem_we;  // ID 到 ID/EX 的内存写使能
-  wire        id_idex_mem_re;  // ID 到 ID/EX 的内存读使能
-  wire [31:0] id_idex_csr_raddr;  // ID 到 ID/EX 的 CSR 读地址
-  wire [31:0] id_idex_csr_waddr;  // ID 到 ID/EX 的 CSR 写地址
-  wire        id_idex_csr_wen;  // ID 到 ID/EX 的 CSR 写使能
-  wire [31:0] id_idex_rs1_data;  // ID 到 ID/EX 的源寄存器 1 数据
-  wire [31:0] id_idex_rs2_data;  // ID 到 ID/EX 的源寄存器 2 数据
+  wire [31:0] id_idex_inst;
+  wire [31:0] id_idex_pc_addr;
+  wire [31:0] id_idex_op1;
+  wire [31:0] id_idex_op2;
+  wire [ 4:0] id_idex_rd_addr;
+  wire        id_idex_reg_wen;
+  wire [ 2:0] id_idex_mem_size;
+  wire [31:0] id_idex_mem_wdata;
+  wire        id_idex_mem_we;
+  wire        id_idex_mem_re;
+  wire [31:0] id_idex_csr_raddr;
+  wire [31:0] id_idex_csr_waddr;
+  wire        id_idex_csr_wen;
+  wire [31:0] id_idex_rs1_data;
+  wire [31:0] id_idex_rs2_data;
 
   // ID/EX to EX
-  wire [31:0] idex_ex_inst;  // ID/EX 到 EX 的指令
-  wire [31:0] idex_ex_pc_addr;  // ID/EX 到 EX 的 PC 地址
-  wire [31:0] idex_ex_op1;  // ID/EX 到 EX 的操作数 1
-  wire [31:0] idex_ex_op2;  // ID/EX 到 EX 的操作数 2
-  wire [ 4:0] idex_ex_rd_addr;  // ID/EX 到 EX 的目标寄存器地址
-  wire        idex_ex_reg_wen;  // ID/EX 到 EX 的寄存器写使能
-  wire [ 2:0] idex_ex_mem_size;  // ID/EX 到 EX 的内存访问大小
-  wire [31:0] idex_ex_mem_wdata;  // ID/EX 到 EX 的内存写数据
-  wire        idex_ex_mem_we;  // ID/EX 到 EX 的内存写使能
-  wire        idex_ex_mem_re;  // ID/EX 到 EX 的内存读使能
-  wire [ 4:0] idex_ex_rs1_addr;  // ID/EX 到 EX 的源寄存器 1 地址
-  wire [ 4:0] idex_ex_rs2_addr;  // ID/EX 到 EX 的源寄存器 2 地址
-  wire [31:0] idex_ex_csr_raddr;  // ID/EX 到 EX 的 CSR 读地址
-  wire [31:0] idex_ex_csr_waddr;  // ID/EX 到 EX 的 CSR 写地址
-  wire        idex_ex_csr_wen;  // ID/EX 到 EX 的 CSR 写使能
-  wire [31:0] idex_ex_rs1_data;  // ID/EX 到 EX 的源寄存器 1 数据
-  wire [31:0] idex_ex_rs2_data;  // ID/EX 到 EX 的源寄存器 2 数据
+  wire [31:0] idex_ex_inst;
+  wire [31:0] idex_ex_pc_addr;
+  wire [31:0] idex_ex_op1;
+  wire [31:0] idex_ex_op2;
+  wire [ 4:0] idex_ex_rd_addr;
+  wire        idex_ex_reg_wen;
+  wire [ 2:0] idex_ex_mem_size;
+  wire [31:0] idex_ex_mem_wdata;
+  wire        idex_ex_mem_we;
+  wire        idex_ex_mem_re;
+  wire [ 4:0] idex_ex_rs1_addr;
+  wire [ 4:0] idex_ex_rs2_addr;
+  wire [31:0] idex_ex_csr_raddr;
+  wire [31:0] idex_ex_csr_waddr;
+  wire        idex_ex_csr_wen;
+  wire [31:0] idex_ex_rs1_data;
+  wire [31:0] idex_ex_rs2_data;
 
   // EX to EX/MEM
-  wire [ 4:0] ex_exmem_rd_addr;  // EX 到 EX/MEM 的目标寄存器地址
-  wire [31:0] ex_exmem_rd_data;  // EX 到 EX/MEM 的目标寄存器数据
-  wire        ex_exmem_reg_wen;  // EX 到 EX/MEM 的寄存器写使能
-  wire [31:0] ex_exmem_mem_addr;  // EX 到 EX/MEM 的内存地址
-  wire [31:0] ex_exmem_mem_wdata;  // EX 到 EX/MEM 的内存写数据
-  wire        ex_exmem_mem_we;  // EX 到 EX/MEM 的内存写使能
-  wire        ex_exmem_mem_re;  // EX 到 EX/MEM 的内存读使能
-  wire [ 2:0] ex_exmem_mem_size;  // EX 到 EX/MEM 的内存访问大小
+  wire [ 4:0] ex_exmem_rd_addr;
+  wire [31:0] ex_exmem_rd_data;
+  wire        ex_exmem_reg_wen;
+  wire [31:0] ex_exmem_mem_addr;
+  wire [31:0] ex_exmem_mem_wdata;
+  wire        ex_exmem_mem_we;
+  wire        ex_exmem_mem_re;
+  wire [ 2:0] ex_exmem_mem_size;
 
   // EX to Control
-  wire [31:0] ex_ctrl_jump_addr;  // EX 到 Control 的跳转地址
-  wire        ex_ctrl_jump_en;  // EX 到 Control 的跳转使能
-  wire        ex_ctrl_hold_flag;  // EX 到 Control 的流水线暂停标志
+  wire [31:0] ex_ctrl_jump_addr;
+  wire        ex_ctrl_jump_en;
+  wire        ex_ctrl_hold_flag;
 
   // EX to CSR
-  wire [31:0] ex_csr_wdata;  // EX 到 CSR 的写数据
-  wire [31:0] ex_csr_waddr;  // EX 到 CSR 的写地址
-  wire        ex_csr_wen;  // EX 到 CSR 的写使能
+  wire [31:0] ex_csr_wdata;
+  wire [31:0] ex_csr_waddr;
+  wire        ex_csr_wen;
 
   // CSR to ID
-  wire [31:0] id_csr_raddr;  // ID 到 CSR 的读地址
-  wire [31:0] csr_id_rdata;  // CSR 到 ID 的读数据
+  wire [31:0] id_csr_raddr;
+  wire [31:0] csr_id_rdata;
 
   // EX/MEM to MEM
-  wire [ 4:0] exmem_mem_rd_addr;  // EX/MEM 到 MEM 的目标寄存器地址
-  wire [31:0] exmem_mem_rd_data;  // EX/MEM 到 MEM 的目标寄存器数据
-  wire        exmem_mem_reg_wen;  // EX/MEM 到 MEM 的寄存器写使能
-  wire [31:0] exmem_mem_ram_rdata;  // EX/MEM 到 MEM 的 RAM 读数据
-  wire        exmem_mem_mem_re;  // EX/MEM 到 MEM 的内存读使能
+  wire [ 4:0] exmem_mem_rd_addr;
+  wire [31:0] exmem_mem_rd_data;
+  wire        exmem_mem_reg_wen;
+  wire        exmem_mem_mem_re;
 
   // MEM to MEM/WB
-  wire [ 4:0] mem_memwb_rd_addr;  // MEM 到 MEM/WB 的目标寄存器地址
-  wire [31:0] mem_memwb_rd_data;  // MEM 到 MEM/WB 的目标寄存器数据
-  wire        mem_memwb_reg_wen;  // MEM 到 MEM/WB 的寄存器写使能
-  wire [31:0] mem_memwb_ram_rdata;  // MEM 到 MEM/WB 的 RAM 读数据
-  wire        mem_memwb_mem_re;  // MEM 到 MEM/WB 的内存读使能
+  wire [ 4:0] mem_memwb_rd_addr;
+  wire [31:0] mem_memwb_rd_data;
+  wire        mem_memwb_reg_wen;
+  wire [31:0] mem_memwb_ram_rdata;
+  wire        mem_memwb_mem_re;
 
   // MEM/WB to WB
-  wire [ 4:0] memwb_wb_rd_addr;  // MEM/WB 到 WB 的目标寄存器地址
-  wire [31:0] memwb_wb_rd_data;  // MEM/WB 到 WB 的目标寄存器数据
-  wire        memwb_wb_reg_wen;  // MEM/WB 到 WB 的寄存器写使能
-  wire [31:0] memwb_wb_ram_rdata;  // MEM/WB 到 WB 的 RAM 读数据
-  wire        memwb_wb_mem_re;  // MEM/WB 到 WB 的内存读使能
+  wire [ 4:0] memwb_wb_rd_addr;
+  wire [31:0] memwb_wb_rd_data;
+  wire        memwb_wb_reg_wen;
+  wire [31:0] memwb_wb_ram_rdata;
+  wire        memwb_wb_mem_re;
 
   // WB to Regs
-  wire [ 4:0] wb_regs_rd_addr;  // WB 到寄存器堆的目标寄存器地址
-  wire [31:0] wb_regs_rd_data;  // WB 到寄存器堆的目标寄存器数据
-  wire        wb_regs_reg_wen;  // WB 到寄存器堆的寄存器写使能
+  wire [ 4:0] wb_regs_rd_addr;
+  wire [31:0] wb_regs_rd_data;
+  wire        wb_regs_reg_wen;
 
   // Control to PC, IF/ID, ID/EX
-  wire [31:0] ctrl_pc_jump_addr;  // Control 到 PC 的跳转地址
-  wire        ctrl_pc_jump_en;  // Control 到 PC 的跳转使能
-  wire        ctrl_hold_flag;  // Control 到各阶段的流水线暂停标志
+  wire [31:0] ctrl_pc_jump_addr;
+  wire        ctrl_pc_jump_en;
+  wire        ctrl_hold_flag;
 
   // Clint to Control and EX
-  wire        clint_ctrl_hold_flag;  // Clint 到 Control 的流水线暂停标志
-  wire [31:0] clint_ex_int_addr;  // Clint 到 EX 的中断入口地址
-  wire        clint_ex_int_assert;  // Clint 到 EX 的中断标志
+  wire        clint_ctrl_hold_flag;
+  wire [31:0] clint_ex_int_addr;
+  wire        clint_ex_int_assert;
 
   // Clint to CSR
-  wire        clint_csr_we;  // Clint 到 CSR 的写使能
-  wire [31:0] clint_csr_waddr;  // Clint 到 CSR 的写地址
-  wire [31:0] clint_csr_raddr;  // Clint 到 CSR 的读地址
-  wire [31:0] clint_csr_wdata;  // Clint 到 CSR 的写数据
+  wire        clint_csr_we;
+  wire [31:0] clint_csr_waddr;
+  wire [31:0] clint_csr_raddr;
+  wire [31:0] clint_csr_wdata;
 
   // CSR to Clint
-  wire [31:0] csr_clint_data;  // CSR 到 Clint 的数据
-  wire [31:0] csr_clint_mtvec;  // CSR 到 Clint 的 mtvec 寄存器值
-  wire [31:0] csr_clint_mepc;  // CSR 到 Clint 的 mepc 寄存器值
-  wire [31:0] csr_clint_mstatus;  // CSR 到 Clint 的 mstatus 寄存器值
-  wire        csr_clint_global_int_en;  // CSR 到 Clint 的全局中断使能
+  wire [31:0] csr_clint_data;
+  wire [31:0] csr_clint_mtvec;
+  wire [31:0] csr_clint_mepc;
+  wire [31:0] csr_clint_mstatus;
+  wire        csr_clint_global_int_en;
 
   // EX 阶段直接连接到外部 RAM 接口
   assign data_addr_o = ex_exmem_mem_addr;
@@ -152,7 +151,6 @@ module cpu_top (
   assign inst_addr_o = pc_if_pc_addr;
 
   // 模块实例化
-  // Program Counter (PC)
   pc_reg u_pc_reg (
       .clk        (clk),
       .rst        (rst),
@@ -161,7 +159,6 @@ module cpu_top (
       .pc_o       (pc_if_pc_addr)
   );
 
-  // Instruction Fetch (IF)
   iF u_if (
       .pc_addr_i    (pc_if_pc_addr),
       .rom_inst_i   (inst_i),
@@ -170,7 +167,6 @@ module cpu_top (
       .inst_o       (if_ifid_inst)
   );
 
-  // IF/ID Pipeline Register
   if_id u_if_id (
       .clk        (clk),
       .rst        (rst),
@@ -181,7 +177,6 @@ module cpu_top (
       .inst_addr_o(ifid_id_pc_addr)
   );
 
-  // Instruction Decode (ID)
   id u_id (
       .inst_i       (ifid_id_inst),
       .inst_addr_i  (ifid_id_pc_addr),
@@ -214,7 +209,6 @@ module cpu_top (
       .csr_raddr_o  (id_csr_raddr)
   );
 
-  // ID/EX Pipeline Register
   id_ex u_id_ex (
       .clk        (clk),
       .rst        (rst),
@@ -255,7 +249,6 @@ module cpu_top (
       .rs2_data_o (idex_ex_rs2_data)
   );
 
-  // Execute (EX)
   ex u_ex (
       .inst_i      (idex_ex_inst),
       .inst_addr_i (idex_ex_pc_addr),
@@ -301,7 +294,6 @@ module cpu_top (
       .int_addr_i  (clint_ex_int_addr)
   );
 
-  // EX/MEM Pipeline Register
   ex_mem u_ex_mem (
       .clk      (clk),
       .rst      (rst),
@@ -315,7 +307,6 @@ module cpu_top (
       .mem_re_o (exmem_mem_mem_re)
   );
 
-  // Memory (MEM)
   mem u_mem (
       .rd_addr_i (exmem_mem_rd_addr),
       .rd_data_i (exmem_mem_rd_data),
@@ -329,7 +320,6 @@ module cpu_top (
       .mem_re_o  (mem_memwb_mem_re)
   );
 
-  // MEM/WB Pipeline Register
   mem_wb u_mem_wb (
       .clk       (clk),
       .rst       (rst),
@@ -345,7 +335,6 @@ module cpu_top (
       .mem_re_o  (memwb_wb_mem_re)
   );
 
-  // Write Back (WB)
   wb u_wb (
       .rd_addr_i (memwb_wb_rd_addr),
       .rd_data_i (memwb_wb_rd_data),
@@ -357,7 +346,6 @@ module cpu_top (
       .rd_wen_o  (wb_regs_reg_wen)
   );
 
-  // Control Unit
   control u_control (
       .jump_addr_i      (ex_ctrl_jump_addr),
       .jump_en_i        (ex_ctrl_jump_en),
@@ -369,7 +357,6 @@ module cpu_top (
       .hold_flag_o      (ctrl_hold_flag)
   );
 
-  // Register File
   regs u_regs (
       .clk        (clk),
       .rst        (rst),
@@ -382,7 +369,6 @@ module cpu_top (
       .reg_wen    (wb_regs_reg_wen)
   );
 
-  // Clint Module
   clint u_clint (
       .clk            (clk),
       .rst            (rst),
@@ -406,7 +392,6 @@ module cpu_top (
       .int_assert_o   (clint_ex_int_assert)
   );
 
-  // CSR Register
   csr_reg u_csr_reg (
       .clk              (clk),
       .rst              (rst),
