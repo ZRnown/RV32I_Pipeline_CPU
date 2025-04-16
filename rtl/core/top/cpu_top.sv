@@ -17,7 +17,7 @@ module cpu_top (
   // 内部信号声明 - 按流水线阶段分组
   // PC to IF
   wire [31:0] pc_if_pc_addr;  // PC 输出到 IF 的程序计数器地址
-
+  wire        rib_ctrl_hold_flag = hold_flag_i;
   // IF to IF/ID
   wire [31:0] if_ifid_inst;  // IF 到 IF/ID 的指令
   wire [31:0] if_ifid_pc_addr;  // IF 到 IF/ID 的 PC 地址
@@ -363,6 +363,7 @@ module cpu_top (
       .jump_en_i        (ex_ctrl_jump_en),
       .hold_flag_ex_i   (ex_ctrl_hold_flag),
       .hold_flag_clint_i(clint_ctrl_hold_flag),
+      .hold_flag_rib_i  (rib_ctrl_hold_flag),
       .jump_addr_o      (ctrl_pc_jump_addr),
       .jump_en_o        (ctrl_pc_jump_en),
       .hold_flag_o      (ctrl_hold_flag)

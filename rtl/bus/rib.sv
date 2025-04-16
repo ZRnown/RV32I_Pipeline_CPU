@@ -94,16 +94,16 @@ module rib (
   always @(*) begin
     if (req[0]) begin
       grant = grant0;
-      hold_flag_o = 1'b1;
+      // hold_flag_o = 1'b1;
     end else if (req[1]) begin
       grant = grant1;
-      hold_flag_o = 1'b1;
+      // hold_flag_o = 1'b1;
     end else if (req[2]) begin
       grant = grant2;
-      hold_flag_o = 1'b1;
+      // hold_flag_o = 1'b1;
     end else begin
       grant = grant3;
-      hold_flag_o = 1'b0;
+      // hold_flag_o = 1'b0;
     end
   end
 
@@ -133,7 +133,6 @@ module rib (
     s3_we_o   = 1'b0;
     s4_we_o   = 1'b0;
     s5_we_o   = 1'b0;
-
     case (grant)
       grant0: begin
         case (m0_addr_i[31:28])
