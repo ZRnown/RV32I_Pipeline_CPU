@@ -112,7 +112,6 @@
     vivado -source synth.tcl
 ```
 
----
 
 # RV32I 五级流水线 CPU 设计文档
 
@@ -165,6 +164,11 @@
    - CSR 寄存器：存储特权级和中断相关状态
    - 中断处理逻辑：处理中断和异常
 
+8. **RIB 总线**：负责连接 CPU 核心与外设。
+   - 主设备接口：连接 CPU 数据通路
+   - 从设备接口：连接 RAM、ROM、UART、GPIO 等外设
+   - 仲裁逻辑：处理多个主设备的访问请求
+
 ### 1.3 流水线数据通路
 
 ```
@@ -207,251 +211,315 @@
    - 在 EX 阶段确定分支结果，并在需要时刷新流水线
    - 对于无条件跳转指令，在 ID 阶段提前计算跳转地址
 
-### 1.5 流水线各阶段详细实现
+## 二、RIB 总线架构与接口设计
 
-#### 1.5.1 取指阶段 (IF)
+### 2.1 RIB 总线概述
 
-取指阶段是流水线的第一个阶段，主要负责从指令存储器中获取指令。其核心实现包括：
+RIB（RISC-V Internal Bus）是本项目中实现的一种简化的片上总线，用于连接 CPU 核心与各种外设。RIB 总线采用主从架构，支持多主多从的连接拓扑，具有以下特点：
+
+- **多主设备支持**：可连接多个主设备（如 CPU 数据通路、DMA 控制器等）
+- **多从设备支持**：可连接多个从设备（如 RAM、ROM、外设等）
+- **仲裁机制**：采用固定优先级仲裁，解决多主设备访问冲突
+- **地址映射**：通过高位地址解码，将访问请求路由到对应的从设备
+- **数据宽度**：支持 32 位数据传输
+- **传输类型**：支持字节、半字、字级别的读写操作
+
+### 2.2 RIB 总线接口定义
+
+#### 2.2.1 主设备接口
+
+每个主设备接口包含以下信号：
 
 ```verilog
-// 取指模块实现摘要
-module iF (
-    input  wire [31:0] pc_addr_i,     // 程序计数器地址输入
-    input  wire [31:0] rom_inst_i,     // 从ROM读取的指令
-    output wire [31:0] if2rom_addr_o,  // 输出到ROM的地址
-    output wire [31:0] inst_addr_o,    // 指令地址输出
-    output wire [31:0] inst_o          // 指令输出
-);
-    // 简单地将输入传递到输出
-    assign inst_addr_o = pc_addr_i;
-    assign inst_o = rom_inst_i;
-    assign if2rom_addr_o = pc_addr_i;
-endmodule
+// 主设备接口示例 (Master 0)
+input  wire [31:0] m0_addr_i,  // 地址输入
+input  wire [31:0] m0_data_i,  // 写数据输入
+output reg  [31:0] m0_data_o,  // 读数据输出
+input  wire        m0_req_i,   // 请求信号
+input  wire        m0_we_i,    // 写使能
+input  wire        m0_re_i,    // 读使能
+input  wire [ 2:0] m0_size_i,  // 数据大小 (000:字节, 001:半字, 010:字)
 ```
 
-取指阶段的主要特点：
+#### 2.2.2 从设备接口
 
-- **PC寄存器**：程序计数器维护当前执行指令的地址，由控制单元更新
-- **指令获取**：根据PC地址从指令存储器(ROM)读取32位指令
-- **地址计算**：正常情况下，PC+4作为下一条指令地址；分支/跳转时，使用计算出的目标地址
-- **流水线寄存器**：IF/ID流水线寄存器保存当前指令和对应PC值，传递给译码阶段
-
-#### 1.5.2 译码阶段 (ID)
-
-译码阶段负责解析指令，读取寄存器值，生成控制信号。其核心实现包括：
+每个从设备接口包含以下信号：
 
 ```verilog
-// 译码模块实现摘要
-module id (
-    // 输入从IF/ID流水线寄存器
-    input  wire [31:0] inst_i,         // 指令
-    input  wire [31:0] inst_addr_i,    // 指令地址
-    // 寄存器堆接口
-    output reg  [ 4:0] rs1_addr_o,     // 源寄存器1地址
-    output reg  [ 4:0] rs2_addr_o,     // 源寄存器2地址
-    input  wire [31:0] rs1_data_i,     // 源寄存器1数据
-    input  wire [31:0] rs2_data_i,     // 源寄存器2数据
-    // 数据前递输入
-    input  wire [ 4:0] ex_rd_addr_i,   // EX阶段目标寄存器地址
-    input  wire [31:0] ex_result_i,    // EX阶段计算结果
-    input  wire        ex_reg_wen_i,   // EX阶段寄存器写使能
-    input  wire [ 4:0] mem_rd_addr_i,  // MEM阶段目标寄存器地址
-    input  wire [31:0] mem_result_i,   // MEM阶段计算结果
-    input  wire        mem_reg_wen_i,  // MEM阶段寄存器写使能
-    // 输出到ID/EX流水线寄存器
-    output reg  [31:0] op1_o,          // 操作数1
-    output reg  [31:0] op2_o,          // 操作数2
-    output reg  [ 4:0] rd_addr_o,      // 目标寄存器地址
-    output reg         reg_wen,        // 寄存器写使能
-    // 其他控制信号...
-);
-    // 指令字段解析
-    wire [ 6:0] opcode = inst_i[6:0];  // 操作码
-    wire [11:0] imm = inst_i[31:20];   // I型立即数
-    wire [ 4:0] rs1 = inst_i[19:15];   // 源寄存器1
-    wire [ 4:0] rs2 = inst_i[24:20];   // 源寄存器2
-    wire [ 4:0] rd = inst_i[11:7];     // 目标寄存器
-    wire [ 2:0] funct3 = inst_i[14:12]; // 功能码3
-    wire [ 6:0] funct7 = inst_i[31:25]; // 功能码7
-    
-    // 数据前递逻辑
-    // 指令解码逻辑
-    // 控制信号生成
-    // ...
-endmodule
+// 从设备接口示例 (Slave 0 - RAM)
+output reg  [31:0] s0_addr_o,  // 地址输出
+output reg  [31:0] s0_data_o,  // 写数据输出
+input  wire [31:0] s0_data_i,  // 读数据输入
+output reg         s0_we_o,    // 写使能
+output reg         s0_re_o,    // 读使能
+output reg  [ 2:0] s0_size_o,  // 数据大小
 ```
 
-译码阶段的主要特点：
+### 2.3 地址映射与解码
 
-- **指令解析**：根据RISC-V指令格式解析操作码、功能码、寄存器地址和立即数
-- **寄存器读取**：从寄存器堆读取源操作数
-- **立即数生成**：根据不同指令格式（I、S、B、U、J型）生成适当的立即数
-- **控制信号生成**：根据指令类型生成ALU操作、内存访问、寄存器写回等控制信号
-- **数据前递检测**：检测数据依赖，准备接收前递数据
-
-#### 1.5.3 执行阶段 (EX)
-
-执行阶段负责进行算术逻辑运算、比较操作和地址计算。其核心实现包括：
+RIB 总线使用地址的高 4 位（[31:28]）来确定访问的从设备：
 
 ```verilog
-// 执行模块实现摘要
-module ex (
-    // 从ID/EX流水线寄存器输入
-    input  wire [31:0] inst_i,        // 指令
-    input  wire [31:0] inst_addr_i,   // 指令地址
-    input  wire [31:0] op1_i,         // 操作数1
-    input  wire [31:0] op2_i,         // 操作数2
-    input  wire [ 4:0] rd_addr_i,     // 目标寄存器地址
-    input  wire        rd_wen_i,      // 寄存器写使能
-    // 数据前递输入
-    input  wire [31:0] mem_rd_data,   // MEM阶段目标寄存器数据
-    input  wire [ 4:0] mem_rd_addr,   // MEM阶段目标寄存器地址
-    input  wire        mem_reg_wen,   // MEM阶段寄存器写使能
-    input  wire [31:0] wb_rd_data,    // WB阶段目标寄存器数据
-    input  wire [ 4:0] wb_rd_addr,    // WB阶段目标寄存器地址
-    input  wire        wb_reg_wen,    // WB阶段寄存器写使能
-    // 输出到EX/MEM流水线寄存器
-    output reg  [31:0] rd_data_o,     // 计算结果
-    output reg  [ 4:0] rd_addr_o,     // 目标寄存器地址
-    output reg         rd_wen_o,      // 寄存器写使能
-    // 跳转控制
-    output reg  [31:0] jump_addr_o,   // 跳转地址
-    output reg         jump_en_o,     // 跳转使能
-    output reg         hold_flag_o    // 流水线暂停标志
-);
-    // 数据前递逻辑
-    reg [31:0] op1;  // 前递后的操作数1
-    reg [31:0] op2;  // 前递后的操作数2
-    
-    // 前递逻辑实现
-    // ALU操作实现
-    // 分支跳转逻辑
-    // ...
-endmodule
+parameter [3:0] slave_0 = 4'b0000;  // RAM
+parameter [3:0] slave_1 = 4'b0001;  // ROM
+parameter [3:0] slave_2 = 4'b0010;  // Timer
+parameter [3:0] slave_3 = 4'b0011;  // UART
+parameter [3:0] slave_4 = 4'b0100;  // GPIO
+parameter [3:0] slave_5 = 4'b0101;  // SPI
 ```
 
-执行阶段的主要特点：
+这种映射方式将整个 4GB 地址空间划分为多个 256MB 的区域，每个区域分配给一个从设备。
 
-- **数据前递**：从MEM和WB阶段接收前递数据，解决数据依赖
-- **ALU操作**：执行算术运算（加、减）、逻辑运算（与、或、异或）、移位操作和比较操作
-- **分支判断**：对条件分支指令进行条件判断，确定是否跳转
-- **地址计算**：计算跳转目标地址和内存访问地址
-- **冒险处理**：检测并处理无法通过前递解决的数据冒险，必要时发出流水线暂停信号
+### 2.4 仲裁机制
 
-#### 1.5.4 访存阶段 (MEM)
-
-访存阶段负责执行内存读写操作。其核心实现包括：
+RIB 总线采用固定优先级仲裁机制，优先级从高到低依次为：Master 0 > Master 1 > Master 2 > Master 3。仲裁逻辑如下：
 
 ```verilog
-// 访存模块实现摘要
-module mem (
-    // 从EX/MEM流水线寄存器输入
-    input  wire [31:0] mem_addr_i,    // 内存访问地址
-    input  wire [31:0] mem_data_i,    // 内存写数据
-    input  wire [ 2:0] mem_size_i,    // 访问大小(字节/半字/字)
-    input  wire        mem_we_i,      // 内存写使能
-    input  wire        mem_re_i,      // 内存读使能
-    input  wire [31:0] rd_data_i,     // 寄存器写数据
-    input  wire [ 4:0] rd_addr_i,     // 寄存器地址
-    input  wire        rd_wen_i,      // 寄存器写使能
-    // 从RAM输入
-    input  wire [31:0] ram_data_i,    // RAM读数据
-    // 输出到RAM
-    output reg  [31:0] ram_addr_o,    // RAM地址
-    output reg  [31:0] ram_data_o,    // RAM写数据
-    output reg  [ 3:0] ram_sel_o,     // 字节选择信号
-    output reg         ram_we_o,      // RAM写使能
-    output reg         ram_re_o,      // RAM读使能
-    // 输出到MEM/WB流水线寄存器
-    output reg  [31:0] rd_data_o,     // 寄存器写数据
-    output reg  [ 4:0] rd_addr_o,     // 寄存器地址
-    output reg         rd_wen_o       // 寄存器写使能
-);
-    // 内存访问逻辑
-    // 数据对齐和扩展
-    // ...
-endmodule
-```
+wire [3:0] req;
+reg  [1:0] grant;
+assign req = {m3_req_i, m2_req_i, m1_req_i, m0_req_i};
 
-访存阶段的主要特点：
-
-- **内存读写**：执行加载(LB/LH/LW/LBU/LHU)和存储(SB/SH/SW)指令
-- **地址对齐**：确保内存访问地址正确对齐
-- **数据扩展**：对加载指令进行符号扩展或零扩展
-- **字节选择**：对于部分写入(SB/SH)，生成适当的字节选择信号
-- **数据前递**：将内存读取结果前递到需要的阶段
-
-#### 1.5.5 写回阶段 (WB)
-
-写回阶段是流水线的最后一个阶段，负责将结果写回寄存器堆。其核心实现包括：
-
-```verilog
-// 写回模块实现摘要
-module wb (
-    // 从MEM/WB流水线寄存器输入
-    input  wire [31:0] rd_data_i,     // 寄存器写数据
-    input  wire [ 4:0] rd_addr_i,     // 寄存器地址
-    input  wire        rd_wen_i,      // 寄存器写使能
-    // 输出到寄存器堆
-    output wire [31:0] rd_data_o,     // 寄存器写数据
-    output wire [ 4:0] rd_addr_o,     // 寄存器地址
-    output wire        rd_wen_o       // 寄存器写使能
-);
-    // 简单传递信号
-    assign rd_data_o = rd_data_i;
-    assign rd_addr_o = rd_addr_i;
-    assign rd_wen_o = rd_wen_i;
-endmodule
-```
-
-写回阶段的主要特点：
-
-- **寄存器写回**：将计算结果或内存读取数据写回到目标寄存器
-- **写回选择**：根据指令类型选择写回数据来源（ALU结果、内存数据、PC+4等）
-- **零寄存器处理**：确保x0寄存器始终为0（不允许写入）
-
-### 1.6 数据冒险处理详细机制
-
-数据冒险是指当一条指令需要使用前面指令的结果，而该结果尚未写回寄存器堆时产生的冲突。本CPU实现了以下数据冒险处理机制：
-
-#### 1.6.1 数据前递（Forwarding）
-
-数据前递是解决大多数数据冒险的主要技术，通过直接将结果从产生阶段传递到需要使用的阶段，避免等待写回。
-
-```verilog
-// 执行阶段的数据前递逻辑
-// rs1前递逻辑
-if (mem_reg_wen && mem_rd_addr != 5'b0 && mem_rd_addr == rs1_addr_i) begin
-    op1 = mem_mem_re_i ? ram_data_i : mem_rd_data;  // 从MEM阶段前递
-end else if (wb_reg_wen && wb_rd_addr != 5'b0 && wb_rd_addr == rs1_addr_i) begin
-    op1 = wb_mem_re_i ? ram_data_i : wb_rd_data;    // 从WB阶段前递
-end else begin
-    op1 = op1_i;  // 使用ID阶段数据
-end
-
-// rs2前递逻辑
-if (mem_reg_wen && mem_rd_addr != 5'b0 && mem_rd_addr == rs2_addr_i) begin
-    op2 = mem_mem_re_i ? ram_data_i : mem_rd_data;  // 从MEM阶段前递
-end else if (wb_reg_wen && wb_rd_addr != 5'b0 && wb_rd_addr == rs2_addr_i) begin
-    op2 = wb_mem_re_i ? ram_data_i : wb_rd_data;    // 从WB阶段前递
-end else begin
-    op2 = op2_i;  // 使用ID阶段数据
+// 仲裁逻辑
+always @(*) begin
+  if (req[0]) begin
+    grant = grant0;  // Master 0 获得总线
+  end else if (req[1]) begin
+    grant = grant1;  // Master 1 获得总线
+  end else if (req[2]) begin
+    grant = grant2;  // Master 2 获得总线
+  end else begin
+    grant = grant3;  // Master 3 获得总线
+  end
 end
 ```
 
-前递机制的主要特点：
+### 2.5 数据传输流程
 
-- **EX阶段前递**：从EX/MEM和MEM/WB流水线寄存器获取结果，直接传递给需要的指令
-- **优先级处理**：当多个阶段都有可用的前递数据时，优先使用较新的结果（EX/MEM优先于MEM/WB）
-- **零寄存器处理**：对于x0寄存器，不进行前递（始终为0）
-- **内存读取特殊处理**：对于加载指令，需要特殊处理前递逻辑，因为数据直到MEM阶段才可用
+1. **主设备发起请求**：主设备通过设置 `m*_req_i` 信号发起总线请求
+2. **仲裁**：总线仲裁逻辑根据优先级选择一个主设备授予总线访问权
+3. **地址解码**：根据地址高位选择目标从设备
+4. **数据传输**：
+   - 读操作：从设备将数据通过 `s*_data_i` 返回，总线将其转发到主设备的 `m*_data_o`
+   - 写操作：主设备的数据通过 `m*_data_i` 传入，总线将其转发到从设备的 `s*_data_o`
 
-#### 1.6.2 流水线暂停（Pipeline Stall）
+### 2.6 与 CPU 的集成
 
-对于无法通过前递解决的数据冒险（如加载-使用冒险），需要插入流水线气泡：
+在本项目中，CPU 核心通过两个独立的接口与外部存储器交互：
+
+1. **指令获取接口**：直接连接到 ROM，不经过 RIB 总线，用于获取指令
+2. **数据访问接口**：通过 RIB 总线连接到各种外设，用于数据读写操作
+
+这种设计实现了哈佛架构，指令和数据使用独立的访问路径，避免了结构冒险，提高了性能。
 
 ```verilog
-// 加载-使用冒险检测
-if (mem_re_i && rd_addr_i != 5'b0 && 
-    (rd_addr_i == rs1_addr_i || rd_addr_i == rs2_addr_i)) begin
-    hold_flag
+// CPU 到 ROM 的直接连接（指令获取）
+wire [31:0] cpu_to_rom_addr;  // CPU 输出到 ROM 的指令地址
+wire [31:0] rom_to_cpu_inst;  // ROM 输出到 CPU 的指令
+
+// CPU 到 RIB 总线的连接（数据访问）
+wire [31:0] cpu_to_bus_addr;  // CPU 输出到总线的数据地址
+wire [31:0] cpu_to_bus_data;  // CPU 输出到总线的写数据
+wire [31:0] bus_to_cpu_data;  // 总线返回到 CPU 的读数据
+wire        cpu_to_bus_we;    // 数据写使能
+wire        cpu_to_bus_re;    // 数据读使能
+wire [ 2:0] cpu_to_bus_size;  // 数据大小
+```
+
+## 三、外设接口与集成
+
+### 3.1 RAM（数据存储器）
+
+RAM 模块实现了数据存储功能，支持字节、半字和字级别的读写操作：
+
+```verilog
+module ram (
+    input  wire        clk,         // 时钟信号
+    input  wire [31:0] mem_addr_i,  // 内存地址输入
+    input  wire [31:0] mem_data_i,  // 写入数据输入
+    input  wire        mem_we_i,    // 写使能
+    input  wire        mem_re_i,    // 读使能
+    input  wire [ 2:0] mem_size_i,  // 操作大小 (000: byte, 001: halfword, 010: word)
+    output reg  [31:0] mem_data_o   // 读取数据输出
+);
+```
+
+主要特点：
+- 支持不同粒度的访问（字节、半字、字）
+- 实现字节选择逻辑，支持非对齐访问
+- 支持有符号和无符号加载操作（符号扩展和零扩展）
+- 写优先设计，同时读写同一地址时，返回新写入的数据
+
+### 3.2 ROM（指令存储器）
+
+ROM 模块存储程序指令，支持从 RIB 总线写入（用于加载程序）和 CPU 直接读取（指令获取）：
+
+```verilog
+module rom (
+    input rst,
+    input clk,
+    input wire we_i,
+    input wire [31:0] addr_i,
+    input wire [31:0] data_i,
+    output reg [31:0] data_o
+);
+```
+
+主要特点：
+- 支持在复位后通过总线加载程序
+- 提供低延迟的指令获取路径
+- 实现 4KB 的指令存储空间
+
+### 3.3 UART 接口
+
+UART 模块实现了串行通信功能，支持与外部设备进行数据交换：
+
+```verilog
+module uart (
+    input  wire        clk,    // 时钟信号
+    input  wire        rst,    // 复位信号
+    input  wire        we_i,   // 写使能
+    input  wire [31:0] addr_i, // 地址输入
+    input  wire [31:0] data_i, // 写数据输入
+    output reg  [31:0] data_o, // 读数据输出
+    input  wire        rx,     // 接收引脚
+    output wire        tx      // 发送引脚
+);
+```
+
+主要特点：
+- 支持可配置的波特率
+- 实现发送和接收缓冲区
+- 提供状态寄存器，指示发送/接收状态
+- 支持中断触发机制
+
+### 3.4 GPIO 接口
+
+GPIO 模块提供了通用输入/输出功能，用于控制和监测外部信号：
+
+```verilog
+module gpio (
+    input  wire        clk,    // 时钟信号
+    input  wire        rst,    // 复位信号
+    input  wire        we_i,   // 写使能
+    input  wire [31:0] addr_i, // 地址输入
+    input  wire [31:0] data_i, // 写数据输入
+    output reg  [31:0] data_o  // 读数据输出
+);
+```
+
+主要特点：
+- 支持引脚方向配置（输入/输出）
+- 提供引脚状态读取功能
+- 支持引脚中断配置
+
+### 3.5 定时器（Timer）
+
+定时器模块提供了精确的时间计数和中断生成功能：
+
+```verilog
+module timer (
+    input  wire        clk,    // 时钟信号
+    input  wire        rst,    // 复位信号
+    input  wire        we_i,   // 写使能
+    input  wire [31:0] addr_i, // 地址输入
+    input  wire [31:0] data_i, // 写数据输入
+    output reg  [31:0] data_o, // 读数据输出
+    output wire        int_o   // 中断输出
+);
+```
+
+主要特点：
+- 支持可编程的计数周期
+- 提供计数值读取功能
+- 支持中断生成和清除
+- 实现多种工作模式（单次计数、循环计数等）
+
+## 四、指令执行流程分析
+
+### 4.1 指令获取流程
+
+1. **PC 更新**：PC 寄存器根据控制信号更新为下一条指令地址
+   ```verilog
+   // 正常顺序执行
+   if (!jump_en_i) begin
+     pc_o <= pc_o + 32'h4;
+   end else begin
+     // 跳转执行
+     pc_o <= jump_addr_i;
+   end
+   ```
+
+2. **指令获取**：IF 阶段从 ROM 读取当前 PC 指向的指令
+   ```verilog
+   assign inst_addr_o = pc_addr_i;
+   assign inst_o = rom_inst_i;
+   assign if2rom_addr_o = pc_addr_i;
+   ```
+
+3. **指令传递**：指令通过 IF/ID 流水线寄存器传递到译码阶段
+   ```verilog
+   always @(posedge clk) begin
+     if (rst == 1'b1) begin
+       inst_o <= 32'h0;
+       inst_addr_o <= 32'h0;
+     end else if (hold_flag_i) begin
+       // 流水线暂停，保持当前值
+     end else begin
+       inst_o <= inst_i;
+       inst_addr_o <= inst_addr_i;
+     end
+   end
+   ```
+
+### 4.2 指令译码流程
+
+1. **指令解析**：ID 阶段解析指令字段
+   ```verilog
+   wire [ 6:0] opcode = inst_i[6:0];  // 操作码
+   wire [11:0] imm = inst_i[31:20];    // I-type立即数
+   wire [ 4:0] rs1 = inst_i[19:15];    // 源寄存器1
+   wire [ 4:0] rs2 = inst_i[24:20];    // 源寄存器2
+   wire [ 4:0] rd = inst_i[11:7];      // 目标寄存器
+   wire [ 2:0] funct3 = inst_i[14:12]; // 功能码3
+   wire [ 6:0] funct7 = inst_i[31:25]; // 功能码7
+   ```
+
+2. **寄存器读取**：从寄存器堆读取源操作数
+   ```verilog
+   rs1_addr_o = rs1;
+   rs2_addr_o = rs2;
+   // 寄存器堆返回数据到 rs1_data_i 和 rs2_data_i
+   ```
+
+3. **立即数生成**：根据指令类型生成立即数
+   ```verilog
+   // I型指令立即数（符号扩展）
+   op2_o = {{20{imm[11]}}, imm};
+   ```
+
+4. **控制信号生成**：根据指令类型生成控制信号
+   ```verilog
+   case (opcode)
+     `INST_TYPE_I: begin
+       // 算术I型指令处理
+       reg_wen = 1'b1;  // 寄存器写使能
+       rd_addr_o = rd;  // 目标寄存器地址
+       op1_o = rs1_data;  // 操作数1为rs1值
+       // ...
+     end
+     // 其他指令类型处理
+   endcase
+   ```
+
+### 4.3 指令执行流程
+
+1. **ALU 操作**：EX 阶段执行算术逻辑运算
+   ```verilog
+   case (opcode)
+     `INST_TYPE_I: begin
+       case (funct3)
+         `INST_ADDI: begin
+           rd_data_o = op1 + op2;  // 加法操作
+           rd_addr_o = rd_addr_i;
+           rd_wen_o  = 1'b1;
+         end
