@@ -40,7 +40,6 @@ module ex (
     output reg  [ 4:0] rd_addr_o,     // 目标寄存器地址
     output reg  [31:0] rd_data_o,     // 目标寄存器数据
     output reg         rd_wen_o,      // 目标寄存器写使能
-    // 输出到 CSR 寄存器(EX/MEM)
     output reg  [31:0] csr_wdata_o,   // CSR 写数据
     output reg  [31:0] csr_waddr_o,   // CSR 写地址
     output reg         csr_wen_o,     // CSR 写使能

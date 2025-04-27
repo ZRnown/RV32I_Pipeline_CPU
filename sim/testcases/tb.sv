@@ -17,18 +17,16 @@ module tb;
   initial begin
     clk = 1'b1;
     rst = 1'b0;
-    rx  = 1'b1;  // UART 空闲状态
-    #50;
+    #20;
     rst = 1'b0;  // 高有效复位
-    #50;
+    #20;
     rst = 1'b1;  // 释放复位
   end
 
   // 加载指令到 ROM
   initial begin
-    $readmemh(
-        "E:\\Files\\Electron\\FPGA\\RV32I_Pipeline_CPU\\sim\\testcases\\generated\\inst_data.txt",
-        tb.u_cpu_top_soc.u_rom.ROM);
+    $readmemb("E:\\Files\\Electron\\FPGA\\RV32I_Pipeline_CPU\\sim\\testcases\\test.txt",
+              tb.u_cpu_top_soc.u_rom.ROM);
   end
 
   // // 预存数据到 RAM

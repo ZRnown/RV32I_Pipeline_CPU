@@ -85,10 +85,10 @@ module cpu_top (
   wire        ex_ctrl_jump_en;
   wire        ex_ctrl_hold_flag;
 
-  // EX to CSR
-  wire [31:0] ex_csr_wdata;
-  wire [31:0] ex_csr_waddr;
-  wire        ex_csr_wen;
+  // WB to CSR
+  wire [31:0] wb_csr_wdata;
+  wire [31:0] wb_csr_waddr;
+  wire        wb_csr_wen;
 
   // CSR to ID
   wire [31:0] id_csr_raddr;
@@ -248,7 +248,9 @@ module cpu_top (
       .rs1_data_o (idex_ex_rs1_data),
       .rs2_data_o (idex_ex_rs2_data)
   );
-
+  wire [31:0] csr_wdata_o_ex_exmem;
+  wire [31:0] csr_waddr_o_ex_exmem;
+  wire csr_wen_o_ex_exmem;
   ex u_ex (
       .inst_i      (idex_ex_inst),
       .inst_addr_i (idex_ex_pc_addr),
@@ -287,63 +289,93 @@ module cpu_top (
       .csr_rdata_i (idex_ex_csr_raddr),
       .csr_waddr_i (idex_ex_csr_waddr),
       .csr_wen_i   (idex_ex_csr_wen),
-      .csr_wdata_o (ex_csr_wdata),
-      .csr_waddr_o (ex_csr_waddr),
-      .csr_wen_o   (ex_csr_wen),
+      .csr_wdata_o (csr_wdata_o_ex_exmem),
+      .csr_waddr_o (csr_waddr_o_ex_exmem),
+      .csr_wen_o   (csr_wen_o_ex_exmem),
       .int_assert_i(clint_ex_int_assert),
       .int_addr_i  (clint_ex_int_addr)
   );
-
+  wire [31:0] csr_wdata_o_exmem_mem;
+  wire [31:0] csr_waddr_o_exmem_mem;
+  wire csr_wen_o_exmem_mem;
   ex_mem u_ex_mem (
-      .clk      (clk),
-      .rst      (rst),
-      .rd_addr_i(ex_exmem_rd_addr),
-      .rd_data_i(ex_exmem_rd_data),
-      .rd_wen_i (ex_exmem_reg_wen),
-      .mem_re_i (ex_exmem_mem_re),
-      .rd_addr_o(exmem_mem_rd_addr),
-      .rd_data_o(exmem_mem_rd_data),
-      .rd_wen_o (exmem_mem_reg_wen),
-      .mem_re_o (exmem_mem_mem_re)
+      .clk        (clk),
+      .rst        (rst),
+      .rd_addr_i  (ex_exmem_rd_addr),
+      .rd_data_i  (ex_exmem_rd_data),
+      .rd_wen_i   (ex_exmem_reg_wen),
+      .mem_re_i   (ex_exmem_mem_re),
+      .rd_addr_o  (exmem_mem_rd_addr),
+      .rd_data_o  (exmem_mem_rd_data),
+      .rd_wen_o   (exmem_mem_reg_wen),
+      .mem_re_o   (exmem_mem_mem_re),
+      .csr_wdata_i(csr_wdata_o_ex_exmem),
+      .csr_waddr_i(csr_waddr_o_ex_exmem),
+      .csr_wen_i  (csr_wen_o_ex_exmem),
+      .csr_wdata_o(csr_wdata_o_exmem_mem),
+      .csr_waddr_o(csr_waddr_o_exmem_mem),
+      .csr_wen_o  (csr_wen_o_exmem_mem)
   );
-
+  wire [31:0] csr_wdata_o_mem_memwb;
+  wire [31:0] csr_waddr_o_mem_memwb;
+  wire csr_wen_o_mem_memwb;
   mem u_mem (
-      .rd_addr_i (exmem_mem_rd_addr),
-      .rd_data_i (exmem_mem_rd_data),
-      .rd_wen_i  (exmem_mem_reg_wen),
+      .rd_addr_i(exmem_mem_rd_addr),
+      .rd_data_i(exmem_mem_rd_data),
+      .rd_wen_i(exmem_mem_reg_wen),
       .ram_data_i(data_i),
-      .mem_re_i  (exmem_mem_mem_re),
-      .rd_addr_o (mem_memwb_rd_addr),
-      .rd_data_o (mem_memwb_rd_data),
-      .rd_wen_o  (mem_memwb_reg_wen),
+      .mem_re_i(exmem_mem_mem_re),
+      .rd_addr_o(mem_memwb_rd_addr),
+      .rd_data_o(mem_memwb_rd_data),
+      .rd_wen_o(mem_memwb_reg_wen),
       .ram_data_o(mem_memwb_ram_rdata),
-      .mem_re_o  (mem_memwb_mem_re)
+      .mem_re_o(mem_memwb_mem_re),
+      .csr_wdata_i(csr_wdata_o_exmem_mem),
+      .csr_waddr_i(csr_waddr_o_exmem_mem),
+      .csr_wen_i(csr_wen_o_exmem_mem),
+      .csr_wdata_o(csr_wdata_o_mem_memwb),
+      .csr_waddr_o(csr_waddr_o_mem_memwb),
+      .csr_wen_o(csr_wen_o_mem_memwb)
   );
-
+  wire [31:0] csr_wdata_o_memwb_wb;
+  wire [31:0] csr_waddr_o_memwb_wb;
+  wire csr_wen_o_memwb_wb;
   mem_wb u_mem_wb (
-      .clk       (clk),
-      .rst       (rst),
-      .rd_addr_i (mem_memwb_rd_addr),
-      .rd_data_i (mem_memwb_rd_data),
-      .rd_wen_i  (mem_memwb_reg_wen),
-      .ram_data_i(mem_memwb_ram_rdata),
-      .mem_re_i  (mem_memwb_mem_re),
-      .rd_addr_o (memwb_wb_rd_addr),
-      .rd_data_o (memwb_wb_rd_data),
-      .rd_wen_o  (memwb_wb_reg_wen),
-      .ram_data_o(memwb_wb_ram_rdata),
-      .mem_re_o  (memwb_wb_mem_re)
+      .clk        (clk),
+      .rst        (rst),
+      .rd_addr_i  (mem_memwb_rd_addr),
+      .rd_data_i  (mem_memwb_rd_data),
+      .rd_wen_i   (mem_memwb_reg_wen),
+      .ram_data_i (mem_memwb_ram_rdata),
+      .mem_re_i   (mem_memwb_mem_re),
+      .rd_addr_o  (memwb_wb_rd_addr),
+      .rd_data_o  (memwb_wb_rd_data),
+      .rd_wen_o   (memwb_wb_reg_wen),
+      .ram_data_o (memwb_wb_ram_rdata),
+      .mem_re_o   (memwb_wb_mem_re),
+      .csr_wdata_i(csr_wdata_o_mem_memwb),
+      .csr_waddr_i(csr_waddr_o_mem_memwb),
+      .csr_wen_i  (csr_wen_o_mem_memwb),
+      .csr_wdata_o(csr_wdata_o_memwb_wb),
+      .csr_waddr_o(csr_waddr_o_memwb_wb),
+      .csr_wen_o  (csr_wen_o_memwb_wb)
   );
 
   wb u_wb (
-      .rd_addr_i (memwb_wb_rd_addr),
-      .rd_data_i (memwb_wb_rd_data),
-      .rd_wen_i  (memwb_wb_reg_wen),
+      .rd_addr_i(memwb_wb_rd_addr),
+      .rd_data_i(memwb_wb_rd_data),
+      .rd_wen_i(memwb_wb_reg_wen),
       .ram_data_i(memwb_wb_ram_rdata),
-      .mem_re_i  (memwb_wb_mem_re),
-      .rd_addr_o (wb_regs_rd_addr),
-      .rd_data_o (wb_regs_rd_data),
-      .rd_wen_o  (wb_regs_reg_wen)
+      .mem_re_i(memwb_wb_mem_re),
+      .rd_addr_o(wb_regs_rd_addr),
+      .rd_data_o(wb_regs_rd_data),
+      .rd_wen_o(wb_regs_reg_wen),
+      .csr_wdata_i(csr_wdata_o_memwb_wb),
+      .csr_waddr_i(csr_waddr_o_memwb_wb),
+      .csr_wen_i(csr_wen_o_memwb_wb),
+      .csr_wdata_o(wb_csr_wdata),
+      .csr_waddr_o(wb_csr_waddr),
+      .csr_wen_o(wb_csr_wen)
   );
 
   control u_control (
@@ -395,10 +427,10 @@ module cpu_top (
   csr_reg u_csr_reg (
       .clk              (clk),
       .rst              (rst),
-      .we_i             (ex_csr_wen),
+      .we_i             (wb_csr_wen),
       .raddr_i          (id_csr_raddr),
-      .waddr_i          (ex_csr_waddr),
-      .data_i           (ex_csr_wdata),
+      .waddr_i          (wb_csr_waddr),
+      .data_i           (wb_csr_wdata),
       .clint_we_i       (clint_csr_we),
       .clint_raddr_i    (clint_csr_raddr),
       .clint_waddr_i    (clint_csr_waddr),
