@@ -5,7 +5,6 @@ Running: E:/Software/Vivado/Vivado/2023.1/bin/unwrapped/win64.o/xelab.exe --incr
 Using 2 slave threads.
 Starting static elaboration
 Pass Through NonSizing Optimizer
-WARNING: [VRFC 10-3091] actual bit length 1 differs from formal bit length 4 for port 'led' [E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/sim/testcases/tb.v:51]
 Completed static elaboration
 Starting simulation data flow analysis
 WARNING: [XSIM 43-4100] "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/fpga/RISCV/RISCV.sim/sim_1/behav/xsim/glbl.v" Line 6. Module glbl has a timescale but at least one module in design doesn't have timescale.
@@ -31,11 +30,16 @@ Compiling module xil_defaultlib.mem_wb
 Compiling module xil_defaultlib.wb
 Compiling module xil_defaultlib.control
 Compiling module xil_defaultlib.regs
+Compiling module xil_defaultlib.clint
+Compiling module xil_defaultlib.csr_reg
 Compiling module xil_defaultlib.cpu_top
-Compiling module xil_defaultlib.rom
 Compiling module xil_defaultlib.ram
-Compiling module xil_defaultlib.axi4_lite_default
+Compiling module xil_defaultlib.rom
+Compiling module xil_defaultlib.timer
 Compiling module xil_defaultlib.uart
+Compiling module xil_defaultlib.gpio
+Compiling module xil_defaultlib.spi
+Compiling module xil_defaultlib.rib
 Compiling module xil_defaultlib.cpu_top_soc
 Compiling module xil_defaultlib.tb
 Compiling module xil_defaultlib.glbl

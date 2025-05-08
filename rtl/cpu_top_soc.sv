@@ -2,7 +2,8 @@ module cpu_top_soc (
     input  wire clk,  // 系统时钟
     input  wire rst,  // 复位（高有效）
     input  wire rx,   // UART 接收引脚
-    output wire tx    // UART 发送引脚
+    output wire tx,    // UART 发送引脚
+    output wire [3:0] led  // 添加 LED 端口
 );
   // CPU 到 ROM 的信号（指令获取，独立总线）
   wire [31:0] cpu_to_rom_addr;  // CPU 输出到 ROM 的指令地址

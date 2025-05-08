@@ -1,11 +1,11 @@
 module ram (
-    input  wire        clk,         // 时钟信号
-    input  wire [31:0] mem_addr_i,  // 内存地址输入
-    input  wire [31:0] mem_data_i,  // 写入数据输入
-    input  wire        mem_we_i,    // 写使能
-    input  wire        mem_re_i,    // 读使能
-    input  wire [ 2:0] mem_size_i,  // 操作大小 (000: byte, 001: halfword, 010: word)
-    output reg  [31:0] mem_data_o   // 读取数据输出
+    input wire clk,  // 时钟信号
+    input wire [31:0] mem_addr_i,  // 内存地址输入
+    input wire [31:0] mem_data_i,  // 写入数据输入
+    input wire mem_we_i,  // 写使能
+    input wire mem_re_i,  // 读使能
+    input  wire [ 2:0] mem_size_i,  // 操作大小 (000: byte, 001: halfword, 010: word, 100: lbu, 101: lhu)
+    output reg [31:0] mem_data_o  // 读取数据输出
 );
   // 定义 4KB 内存，32 位宽，地址范围 0-4095
   reg [31:0] memory[0:2047];
@@ -20,16 +20,18 @@ module ram (
     case (mem_size_i)
       3'b000: begin  // 字节操作 (sb)
         case (byte_offset)
-          2'b00: wea = 4'b0001;
-          2'b01: wea = 4'b0010;
-          2'b10: wea = 4'b0100;
-          2'b11: wea = 4'b1000;
+          2'b00:   wea = 4'b0001;
+          2'b01:   wea = 4'b0010;
+          2'b10:   wea = 4'b0100;
+          2'b11:   wea = 4'b1000;
+          default: wea = 4'b0000;
         endcase
       end
       3'b001: begin  // 半字操作 (sh)
         case (byte_offset[1])
           1'b0: wea = 4'b0011;
           1'b1: wea = 4'b1100;
+          default: wea = 4'b0000;
         endcase
       end
       3'b010:  wea = 4'b1111;  // 字操作 (sw)
@@ -61,56 +63,62 @@ module ram (
     end
   end
 
-  // 同步读（写优先）
-  always @(posedge clk) begin
+  // 组合读（写优先）
+  always @(*) begin
     if (mem_re_i) begin
       if (mem_we_i && word_addr == mem_addr_i[31:2]) begin
         // 写优先，前递新数据
         case (mem_size_i)
-          3'b000:  mem_data_o <= {{24{mem_data_i[7]}}, mem_data_i[7:0]};  // lb
-          3'b001:  mem_data_o <= {{16{mem_data_i[15]}}, mem_data_i[15:0]};  // lh
-          3'b010:  mem_data_o <= mem_data_i;  // lw
-          3'b100:  mem_data_o <= {24'b0, mem_data_i[7:0]};  // lbu
-          3'b101:  mem_data_o <= {16'b0, mem_data_i[15:0]};  // lhu
-          default: mem_data_o <= 32'b0;
+          3'b000:  mem_data_o = {{24{mem_data_i[7]}}, mem_data_i[7:0]};  // lb
+          3'b001:  mem_data_o = {{16{mem_data_i[15]}}, mem_data_i[15:0]};  // lh
+          3'b010:  mem_data_o = mem_data_i;  // lw
+          3'b100:  mem_data_o = {24'b0, mem_data_i[7:0]};  // lbu
+          3'b101:  mem_data_o = {16'b0, mem_data_i[15:0]};  // lhu
+          default: mem_data_o = 32'b0;
         endcase
       end else begin
         // 正常读取
         case (mem_size_i)
           3'b000: begin  // lb (有符号字节加载)
             case (byte_offset)
-              2'b00: mem_data_o <= {{24{memory[word_addr][7]}}, memory[word_addr][7:0]};
-              2'b01: mem_data_o <= {{24{memory[word_addr][15]}}, memory[word_addr][15:8]};
-              2'b10: mem_data_o <= {{24{memory[word_addr][23]}}, memory[word_addr][23:16]};
-              2'b11: mem_data_o <= {{24{memory[word_addr][31]}}, memory[word_addr][31:24]};
+              2'b00:   mem_data_o = {{24{memory[word_addr][7]}}, memory[word_addr][7:0]};
+              2'b01:   mem_data_o = {{24{memory[word_addr][15]}}, memory[word_addr][15:8]};
+              2'b10:   mem_data_o = {{24{memory[word_addr][23]}}, memory[word_addr][23:16]};
+              2'b11:   mem_data_o = {{24{memory[word_addr][31]}}, memory[word_addr][31:24]};
+              default: mem_data_o = 32'b0;
             endcase
           end
           3'b001: begin  // lh (有符号半字加载)
             case (byte_offset[1])
-              1'b0: mem_data_o <= {{16{memory[word_addr][15]}}, memory[word_addr][15:0]};
-              1'b1: mem_data_o <= {{16{memory[word_addr][31]}}, memory[word_addr][31:16]};
+              1'b0: mem_data_o = {{16{memory[word_addr][15]}}, memory[word_addr][15:0]};
+              1'b1: mem_data_o = {{16{memory[word_addr][31]}}, memory[word_addr][31:16]};
+              default: mem_data_o = 32'b0;
             endcase
           end
           3'b010: begin  // lw (字加载)
-            mem_data_o <= memory[word_addr];
+            mem_data_o = memory[word_addr];
           end
           3'b100: begin  // lbu (无符号字节加载)
             case (byte_offset)
-              2'b00: mem_data_o <= {24'b0, memory[word_addr][7:0]};
-              2'b01: mem_data_o <= {24'b0, memory[word_addr][15:8]};
-              2'b10: mem_data_o <= {24'b0, memory[word_addr][23:16]};
-              2'b11: mem_data_o <= {24'b0, memory[word_addr][31:24]};
+              2'b00:   mem_data_o = {24'b0, memory[word_addr][7:0]};
+              2'b01:   mem_data_o = {24'b0, memory[word_addr][15:8]};
+              2'b10:   mem_data_o = {24'b0, memory[word_addr][23:16]};
+              2'b11:   mem_data_o = {24'b0, memory[word_addr][31:24]};
+              default: mem_data_o = 32'b0;
             endcase
           end
           3'b101: begin  // lhu (无符号半字加载)
             case (byte_offset[1])
-              1'b0: mem_data_o <= {16'b0, memory[word_addr][15:0]};
-              1'b1: mem_data_o <= {16'b0, memory[word_addr][31:16]};
+              1'b0: mem_data_o = {16'b0, memory[word_addr][15:0]};
+              1'b1: mem_data_o = {16'b0, memory[word_addr][31:16]};
+              default: mem_data_o = 32'b0;
             endcase
           end
-          default: mem_data_o <= 32'b0;
+          default: mem_data_o = 32'b0;
         endcase
       end
+    end else begin
+      mem_data_o = 32'b0;  // 读使能关闭时输出 0
     end
   end
 

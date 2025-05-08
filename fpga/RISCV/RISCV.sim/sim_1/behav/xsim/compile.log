@@ -1,40 +1,54 @@
-INFO: [VRFC 10-2263] Analyzing Verilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/perips/RAM.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/perips/GPIO.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module gpio
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/perips/RAM.sv" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module ram
-INFO: [VRFC 10-2263] Analyzing Verilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/perips/ROM.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/perips/ROM.sv" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module rom
-INFO: [VRFC 10-2263] Analyzing Verilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/perips/UART.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/perips/SPI.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module spi
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/perips/TIMER.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module timer
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/perips/UART.sv" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module uart
-INFO: [VRFC 10-2263] Analyzing Verilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/bus/axi4_lite.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module axi4_lite
-INFO: [VRFC 10-2263] Analyzing Verilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/common/control.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/clint/clint.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module clint
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/common/control.sv" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module control
-INFO: [VRFC 10-2263] Analyzing Verilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/top/cpu_top.v" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/top/cpu_top.sv" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module cpu_top
-INFO: [VRFC 10-2263] Analyzing Verilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/utils/dff_set.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module dff_set
-INFO: [VRFC 10-2263] Analyzing Verilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/utils/dff_set_hold.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module dff_set_hold
-INFO: [VRFC 10-2263] Analyzing Verilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/execute/ex.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module ex
-INFO: [VRFC 10-2263] Analyzing Verilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/execute/ex_mem.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module ex_mem
-INFO: [VRFC 10-2263] Analyzing Verilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module id
-INFO: [VRFC 10-2263] Analyzing Verilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id_ex.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module id_ex
-INFO: [VRFC 10-2263] Analyzing Verilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/if.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module iF
-INFO: [VRFC 10-2263] Analyzing Verilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/if_id.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module if_id
-INFO: [VRFC 10-2263] Analyzing Verilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/memory/mem.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module mem
-INFO: [VRFC 10-2263] Analyzing Verilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/memory/mem_wb.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module mem_wb
-INFO: [VRFC 10-2263] Analyzing Verilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/pc_reg.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module pc_reg
-INFO: [VRFC 10-2263] Analyzing Verilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/regs.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module regs
-INFO: [VRFC 10-2263] Analyzing Verilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/writeback/wb.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module wb
 INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/cpu_top_soc.sv" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module cpu_top_soc
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/clint/csr_reg.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module csr_reg
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/utils/dff_set.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dff_set
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/utils/dff_set_hold.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dff_set_hold
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/execute/ex.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module ex
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/execute/ex_mem.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module ex_mem
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module id
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/id_ex.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module id_ex
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/if.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module iF
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/if_id.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module if_id
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/memory/mem.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module mem
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/memory/mem_wb.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module mem_wb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/fetch/pc_reg.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module pc_reg
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/decode/regs.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module regs
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/bus/rib.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module rib
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/rtl/core/writeback/wb.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module wb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/sim/testcases/tb.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module tb
+INFO: [VRFC 10-2263] Analyzing Verilog file "E:/Files/Electron/FPGA/RV32I_Pipeline_CPU/fpga/RISCV/RISCV.sim/sim_1/behav/xsim/glbl.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module glbl
